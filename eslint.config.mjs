@@ -20,9 +20,14 @@ const eslintConfig = [
       "next-env.d.ts",
     ],
     rules: {
-    '@next/next/no-img-element': 'off',
-    'react/no-unescaped-entities': 'warn',
-    '@typescript-eslint/no-explicit-any': 'warn',
+     'react/no-unescaped-entities': 'warn', // Warn on unescaped characters like ' in JSX
+    'jsx-a11y/alt-text': 'warn',           // Warn when <img> elements lack alt attribute
+
+    // Next.js specific rules
+    '@next/next/no-img-element': 'warn',   // Warn for <img>, recommend usage of <Image>
+
+    // TypeScript linting rules
+    '@typescript-eslint/no-explicit-any': ['warn', { ignoreRestArgs: true }],
   },
   },
 ];

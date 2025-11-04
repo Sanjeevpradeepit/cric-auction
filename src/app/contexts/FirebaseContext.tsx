@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
-import { collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, writeBatch, query, where, getDocs, runTransaction, Timestamp } from 'firebase/firestore';
+import { collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, runTransaction, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 // import { Team } from '../../../types';
 
