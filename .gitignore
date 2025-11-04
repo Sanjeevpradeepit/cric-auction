@@ -1,0 +1,12 @@
+# Ignore node modules
+node_modules/
+
+# Ignore log files
+*.log
+.next/
+# Ignore build output
+dist/
+build/
+
+# Ignore OS files (example for macOS)
+.DS_Store

@@ -1,0 +1,42 @@
+export interface Player {
+  id: string;
+  name: string;
+  nationality: string;
+  position: 'Batsman' | 'Bowler' | 'All-Rounder' | 'Wicketkeeper';
+  baseCoins: number;
+  stats: {
+    battingAverage: number;
+    strikeRate: number;
+    wickets: number;
+    economyRate: number;
+  };
+  profileImageURL: string;
+  actionImageURL: string;
+}
+
+export interface Owner {
+  id: string;
+  name: string;
+  role: string;
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  logoURL: string;
+  coins: number;
+  players: Player[];
+  owners: Owner[];
+  email: string;
+  password?: string; // In a real app, this would be handled securely
+}
+
+export interface Bid {
+  id:string;
+  teamId: string;
+  playerId: string;
+  amount: number;
+  timestamp: number;
+}
+
+export type Page = 'home' | 'live-auction' | 'create-auction' | 'teams' | 'players' | 'results' | 'help' | 'login' | 'admin-login' | 'admin-dashboard' | 'unsold-players' | 'player-details' | 'sold-players' | 'auction-selection' | 'add-player' | 'add-team';
