@@ -5,15 +5,14 @@ import { getStorage } from "firebase/storage";
 
 // TODO: Replace with your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyC2jTHdt6Hnt3-SjEXrbylAJdMD5MCgd1Y",
-  authDomain: "cric-auction-7bd24.firebaseapp.com",
-  projectId: "cric-auction-7bd24",
-  storageBucket: "cric-auction-7bd24.firebasestorage.app",
-  messagingSenderId: "582324412853",
-  appId: "1:582324412853:web:d2fdda63b48b3852e5b9fc",
-  measurementId: "G-SNH52Y8DVK"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
