@@ -63,7 +63,7 @@ const PlayerManagementPage: React.FC<PlayerManagementPageProps> = ({ onViewPlaye
           {loggedInAdmin && (
             <button
               onClick={() => setCurrentPage('add-player')}
-              className="bg-primary hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-transform duration-200 hover:scale-105"
+              className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg transition-transform duration-200 hover:scale-105"
             >
               Add New Player
             </button>

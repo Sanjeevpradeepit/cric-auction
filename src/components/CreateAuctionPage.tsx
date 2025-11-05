@@ -24,7 +24,7 @@ const CreateAuctionPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto bg-surface p-8 rounded-xl shadow-lg">
-      <h1 className="text-3xl font-bold text-center mb-2 text-text-primary">Create New Auction</h1>
+      <h1 className="text-3xl font-bold text-center mb-2 text-primary">Create New Auction</h1>
       <p className="text-center text-text-secondary mb-8">Fill in the details below to set up your cricket auction.</p>
       
       <form onSubmit={handleSubmit} className="space-y-6">

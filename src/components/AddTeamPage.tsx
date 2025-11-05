@@ -44,7 +44,7 @@ const AddTeamPage: React.FC<AddTeamPageProps> = ({ setCurrentPage }) => {
 
   return (
     <div className="max-w-2xl mx-auto">
-       <button onClick={() => setCurrentPage('teams')} className="flex items-center space-x-2 text-primary hover:underline mb-4">
+       <button onClick={() => setCurrentPage('teams')} className="flex items-center space-x-2 text-secondary hover:underline mb-4">
           <ArrowLeftIcon className="w-5 h-5" />
           <span>Back to Team Management</span>
         </button>
@@ -63,7 +63,7 @@ const AddTeamPage: React.FC<AddTeamPageProps> = ({ setCurrentPage }) => {
           </div>
           <input name="email" type="email" value={newTeam.email} onChange={handleInputChange} placeholder="Login Email" className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg" required />
           <input name="password" type="password" value={newTeam.password} onChange={handleInputChange} placeholder="Login Password" className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg" required />
-          <button type="submit" className="w-full bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105">Save Team</button>
+          <button type="submit" className="w-full bg-primary hover:bg-secondary text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105">Save Team</button>
         </form>
       </div>
     </div>

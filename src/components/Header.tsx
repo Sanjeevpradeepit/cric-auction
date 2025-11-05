@@ -2,6 +2,7 @@ import React from 'react';
 import { Page } from '../../types';
 import { BatIcon } from './IconComponents';
 import { useFirebase } from '@/app/contexts/FirebaseContext';
+import Image from 'next/image';
 
 interface HeaderProps {
   setCurrentPage: (page: Page) => void;
@@ -25,7 +26,12 @@ const Header: React.FC<HeaderProps> = ({ setCurrentPage }) => {
             {!isLoggedIn && (
                <div className="flex-shrink-0 text-white flex items-center gap-2 cursor-pointer" onClick={() => setCurrentPage('home')}>
                 <BatIcon className="h-8 w-8 text-primary" />
-                <span className="font-bold text-xl">Cricket Auction Pro</span>
+                <span className="font-bold text-xl"><Image src="https://pgcdigital.ai/wp-content/uploads/2023/06/OG-PGCpng-1.png"   alt="PGC Digital Logo"
+      width={100}     // specify fixed width in pixels
+      height={300}    // specify fixed height in pixels
+      priority={true} // optionally preload important images
+    />
+    </span>
               </div>
             )}
           </div>

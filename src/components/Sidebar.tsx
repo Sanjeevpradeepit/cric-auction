@@ -3,6 +3,7 @@ import { Page } from '../../types';
 // FIX: Replaced useMockData with useFirebase from the context.
 import { useFirebase } from '@/app/contexts/FirebaseContext';
 import { BatIcon } from './IconComponents';
+import Image from 'next/image';
 
 interface SidebarProps {
   currentPage: Page;
@@ -22,7 +23,7 @@ const NavLink: React.FC<{
       className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 block ${
         isActive
           ? 'bg-primary text-white'
-          : 'text-primary hover:bg-surface hover:text-text-primary'
+          : 'text-secondary hover:bg-surface hover:text-text-primary'
       }`}
     >
       {children}
@@ -67,7 +68,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage }) => {
       <div className="p-4">
         <div className="flex-shrink-0 text-white flex items-center gap-2 cursor-pointer mb-8" onClick={() => setCurrentPage(loggedInAdmin ? 'admin-dashboard' : 'home')}>
             <BatIcon className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl">Cricket Auction Pro</span>
+            <span className="font-bold text-xl"><Image src="https://pgcdigital.ai/wp-content/uploads/2023/06/OG-PGCpng-1.png"   alt="PGC Digital Logo"
+                  width={100}     // specify fixed width in pixels
+                  height={300}    // specify fixed height in pixels
+                  priority={true} // optionally preload important images
+                />
+                </span>
         </div>
         <nav className="space-y-2">
           {navLinks.map(link => (

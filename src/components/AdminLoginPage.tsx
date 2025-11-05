@@ -38,18 +38,18 @@ const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ setCurrentPage }) => {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-text-secondary mb-2">Username</label>
+            <label htmlFor="username" className="block text-sm font-medium text-secondary mb-2">Username</label>
             <input 
               type="text" 
               id="username" 
               value={username}
               readOnly
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg" 
+              className="w-full px-4 py-2 border border-gray-600 rounded-lg" 
             />
              <p className="text-xs text-text-secondary mt-1">Admin email is superadmin@auction.com</p>
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-text-secondary mb-2">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-secondary mb-2">Password</label>
             <input 
               type="password" 
               id="password" 
@@ -62,7 +62,7 @@ const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ setCurrentPage }) => {
           </div>
           <button 
             type="submit" 
-            className="w-full bg-primary hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform duration-200 hover:scale-105"
+            className="w-full bg-primary hover:bg-secondary text-white font-bold py-3 px-8 rounded-lg text-lg transition-transform duration-200 hover:scale-105"
           >
             Login
           </button>
