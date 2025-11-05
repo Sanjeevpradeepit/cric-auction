@@ -57,8 +57,8 @@ const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({ setCurrentPag
                  <h2 className="text-2xl font-bold mb-4">Quick Actions</h2>
                  <div className="flex flex-col sm:flex-row gap-4">
                      <button onClick={() => setCurrentPage('live-auction')} className="bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105">Go to Auction Control</button>
-                     <button onClick={() => setCurrentPage('teams')} className="bg-secondary hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105">Manage Teams</button>
-                     <button onClick={() => setCurrentPage('players')} className="bg-surface hover:bg-background text-white font-bold py-3 px-6 rounded-lg border border-gray-600 transition-colors">Manage Players</button>
+                     <button onClick={() => setCurrentPage('teams')} className="bg-primary hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105">Manage Teams</button>
+                     <button onClick={() => setCurrentPage('players')} className="bg-primary hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg border border-gray-600 transition-colors">Manage Players</button>
                  </div>
             </section>
         </div>

@@ -22,7 +22,7 @@ const NavLink: React.FC<{
       className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 block ${
         isActive
           ? 'bg-primary text-white'
-          : 'text-text-secondary hover:bg-surface hover:text-text-primary'
+          : 'text-primary hover:bg-surface hover:text-text-primary'
       }`}
     >
       {children}

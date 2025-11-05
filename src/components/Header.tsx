@@ -47,12 +47,12 @@ const Header: React.FC<HeaderProps> = ({ setCurrentPage }) => {
                 >
                   Admin Login
                 </button>
-                <button
+                {/* <button
                   onClick={() => setCurrentPage('login')}
                   className="bg-secondary hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg transition-transform duration-200 hover:scale-105"
                 >
                   Team Login
-                </button>
+                </button> */}
               </div>
             )}
           </div>
