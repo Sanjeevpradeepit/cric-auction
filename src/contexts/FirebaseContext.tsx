@@ -3,10 +3,9 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useMe
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
 import { collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, runTransaction, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { auth, db, storage } from '@/lib/firebase';
 // import { Team } from '../../../types';
 
-import { Player, Team, Bid, Owner } from '../../../types';
-import { auth, db, storage } from '../../../firebase';
 
 // Define the shape of the context value
 interface FirebaseContextType {

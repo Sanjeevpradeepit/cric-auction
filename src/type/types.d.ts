@@ -1,4 +1,4 @@
-export interface Player {
+ interface Player {
   id: string;
   name: string;
   nationality: string;
@@ -14,13 +14,13 @@ export interface Player {
   actionImageURL: string;
 }
 
-export interface Owner {
+ interface Owner {
   id: string;
   name: string;
   role: string;
 }
 
-export interface Team {
+ interface Team {
   id: string;
   name: string;
   logoURL: string;
@@ -28,10 +28,12 @@ export interface Team {
   players: Player[];
   owners: Owner[];
   email: string;
-  password?: string; // In a real app, this would be handled securely
+  password?: string | undefined; // In a real app, this would be handled securely
 }
 
-export interface Bid {
+
+
+ interface Bid {
   id:string;
   teamId: string;
   playerId: string;
@@ -39,4 +41,4 @@ export interface Bid {
   timestamp: number;
 }
 
-export type Page = 'home' | 'live-auction' | 'create-auction' | 'teams' | 'players' | 'results' | 'help' | 'login' | 'admin-login' | 'admin-dashboard' | 'unsold-players' | 'player-details' | 'sold-players' | 'auction-selection' | 'add-player' | 'add-team';
+ type Page = 'home' | 'live-auction' | 'create-auction' | 'teams' | 'players' | 'results' | 'help' | 'login' | 'admin-login' | 'admin-dashboard' | 'unsold-players' | 'player-details' | 'sold-players' | 'auction-selection' | 'add-player' | 'add-team';

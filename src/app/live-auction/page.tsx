@@ -1,9 +1,7 @@
 "use client";
+import { ClockIcon, GavelIcon, MoneyIcon } from '@/components/IconComponents';
+import { useFirebase } from '@/contexts/FirebaseContext';
 import React, { useEffect, useState } from 'react';
-import { Player } from '../type/types';
-// FIX: Replaced useMockData with useFirebase from the context.
-import { useFirebase } from '@/app/contexts/FirebaseContext';
-import { MoneyIcon, ClockIcon, TrophyIcon, GavelIcon } from './IconComponents';
 
 const PlayerCard: React.FC<{ player: Player }> = ({ player }) => (
     <div className="bg-surface rounded-xl shadow-2xl overflow-hidden relative">

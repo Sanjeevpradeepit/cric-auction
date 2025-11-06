@@ -1,5 +1,5 @@
 import React from 'react';
-import { Player } from '../../types';
+import { Player } from '../type/types';
 
 export interface Filters {
   position: 'All' | Player['position'];

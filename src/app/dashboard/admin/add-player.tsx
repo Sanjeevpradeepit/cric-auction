@@ -1,8 +1,7 @@
 "use client";
+import { useFirebase } from '@/contexts/FirebaseContext';
+import { ArrowLeftIcon } from 'lucide-react';
 import React, { useState } from 'react';
-import { Page, Player } from '../type/types';
-import { ArrowLeftIcon } from './IconComponents';
-import { useFirebase } from '@/app/contexts/FirebaseContext';
 
 interface AddPlayerPageProps {
   setCurrentPage: (page: Page) => void;

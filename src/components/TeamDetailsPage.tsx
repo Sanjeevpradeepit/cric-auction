@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 // FIX: Replaced useMockData with useFirebase from the context.
 import { useFirebase } from '@/app/contexts/FirebaseContext';
 import { ArrowLeftIcon, MoneyIcon, EditIcon, TrashIcon } from './IconComponents';
-import { Team, Owner } from '../../types';
+import { Team, Owner } from '../type/types';
 import Modal from './Modal';
 import PlayerFilters, { Filters } from './PlayerFilters';
 

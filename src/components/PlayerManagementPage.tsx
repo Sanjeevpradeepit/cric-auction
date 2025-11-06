@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
-import { Player, Page } from '../../types';
+import { Player, Page } from '../type/types';
 // FIX: Replaced useMockData with useFirebase from the context.
 import { useFirebase } from '@/app/contexts/FirebaseContext';
 import { EditIcon, TrashIcon, EyeIcon } from './IconComponents';

@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useFirebase } from '../contexts/FirebaseContext';
 import { useRouter } from 'next/navigation';
-import { EditIcon, TrashIcon, EyeIcon } from './IconComponents';
-import Modal from './Modal';
+import { useFirebase } from '@/contexts/FirebaseContext';
+import { EditIcon, EyeIcon, TrashIcon } from '@/components/IconComponents';
+import Modal from '@/components/Modal';
 
 const TeamManagementPage: React.FC = () => {
   const { teams, loggedInAdmin, updateTeam, deleteTeam } = useFirebase();
