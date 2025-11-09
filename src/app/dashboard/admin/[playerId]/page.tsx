@@ -1,10 +1,14 @@
+
+"use client"
+
+import { ArrowLeftIcon } from '@/components/IconComponents';
+import { useFirebase } from '@/contexts/FirebaseContext';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 // FIX: Replaced useMockData with useFirebase from the context.
-import { ArrowLeftIcon } from './IconComponents';
-import { useFirebase } from '@/contexts/FirebaseContext';
 
 interface PlayerDetailsPageProps {
-  playerId: string;
+  params: { playerId: string }
 }
 
 const StatItem: React.FC<{ label: string; value: string | number }> = ({ label, value }) => (
@@ -14,21 +18,24 @@ const StatItem: React.FC<{ label: string; value: string | number }> = ({ label, 
     </div>
 );
 
-const PlayerDetailsPage: React.FC = () => {
+const PlayerDetailsPage: React.FC<PlayerDetailsPageProps> = ({ params }) => {
   // FIX: Replaced useMockData with useFirebase from the context.
+      const router = useRouter();
   const { players, teams, bids } = useFirebase();
   
-  const player = players.find(p => p.id === playerId);
-  const playerBids = bids.filter(b => b.playerId === playerId).sort((a,b) => b.timestamp - a.timestamp);
+  const player = players.find(p => p.id === params.playerId);
+  const playerBids = bids.filter(b => b.playerId === params.playerId).sort((a,b) => b.timestamp - a.timestamp);
+  
 
-  const handleBack = () =>{
 
-  }
- 
+    const handleOnBack = () => {
+    router.push(`/dashboard/admin/players`);
+  };
+
   if (!player) {
     return (
       <div>
-        <button onClick={handleBack} className="flex items-center space-x-2 text-primary hover:underline mb-4">
+        <button onClick={handleOnBack} className="flex items-center space-x-2 text-primary hover:underline mb-4">
           <ArrowLeftIcon className="w-5 h-5" />
           <span>Back</span>
         </button>
@@ -40,7 +47,7 @@ const PlayerDetailsPage: React.FC = () => {
   return (
     <div className="space-y-8">
       <div>
-        <button onClick={handleBack} className="flex items-center space-x-2 text-primary hover:underline mb-4">
+        <button onClick={handleOnBack} className="flex items-center space-x-2 text-primary hover:underline mb-4">
           <ArrowLeftIcon className="w-5 h-5" />
           <span>Back</span>
         </button>

@@ -1,14 +1,14 @@
 "use client";
+import { ArrowLeftIcon } from '@/components/IconComponents';
 import { useFirebase } from '@/contexts/FirebaseContext';
-import { ArrowLeftIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 interface AddPlayerPageProps {
-  // setCurrentPage: (page: Page) => void;
+  setCurrentPage: (page: Page) => void;
 }
 
-const AddPlayerPage: React.FC<AddPlayerPageProps> = () => {
+const AddPlayerPage: React.FC<AddPlayerPageProps> = ({ setCurrentPage }) => {
   const { addPlayer } = useFirebase();
    const router = useRouter();
   const [newPlayer, setNewPlayer] = useState<Omit<Player, 'id' | 'stats'>>({
@@ -44,9 +44,10 @@ const AddPlayerPage: React.FC<AddPlayerPageProps> = () => {
     };
     await addPlayer(playerToAdd, profileFile || undefined, actionFile || undefined);
     alert('Player added successfully!');
+    setCurrentPage('players');
   };
 
-  const handleBack = () =>{
+    const handleBack = () =>{
     router.push('/dashboard/admin/players')
   }
   

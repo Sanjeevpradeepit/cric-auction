@@ -1,14 +1,17 @@
 "use client";
 
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useFirebase } from '@/contexts/FirebaseContext';
 import { EditIcon, EyeIcon, TrashIcon } from '@/components/IconComponents';
 import Modal from '@/components/Modal';
-import { useFirebase } from '@/contexts/FirebaseContext';
-import React, { useState, useEffect } from 'react';
+import { Team } from '@/type/types';
 
 const TeamManagementPage: React.FC = () => {
   const { teams, loggedInAdmin, updateTeam, deleteTeam } = useFirebase();
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
   const [editedTeamData, setEditedTeamData] = useState<Partial<Team> & { owners?: Owner[] }>({});
+  const router = useRouter();
 
   useEffect(() => {
     if (editingTeam) {
@@ -20,10 +23,7 @@ const TeamManagementPage: React.FC = () => {
 
   const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
-    setEditedTeamData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? parseInt(value) : value,
-    }));
+    setEditedTeamData(prev => ({ ...prev, [name]: type === 'number' ? parseInt(value) : value }));
   };
 
   const handleOwnerChange = (index: number, field: 'name' | 'role', value: string) => {
@@ -34,17 +34,11 @@ const TeamManagementPage: React.FC = () => {
 
   const addOwner = () => {
     const newOwner: Owner = { id: `owner-${Date.now()}`, name: '', role: '' };
-    setEditedTeamData(prev => ({
-      ...prev,
-      owners: [...(prev.owners || []), newOwner],
-    }));
+    setEditedTeamData(prev => ({ ...prev, owners: [...(prev.owners || []), newOwner] }));
   };
 
   const removeOwner = (index: number) => {
-    setEditedTeamData(prev => ({
-      ...prev,
-      owners: prev.owners?.filter((_, i) => i !== index),
-    }));
+    setEditedTeamData(prev => ({ ...prev, owners: prev.owners?.filter((_, i) => i !== index) }));
   };
 
   const handleDeleteTeam = (teamId: string) => {
@@ -65,6 +59,16 @@ const TeamManagementPage: React.FC = () => {
     }
   };
 
+  // Navigate to team detail page on view
+  const handleViewTeam = (teamId: string) => {
+    router.push(`/dashboard/admin/teams/${teamId}`);
+  };
+
+  // Navigate to add team page
+  const handleAddTeam = () => {
+    router.push('/dashboard/admin/add-team');
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <div className="bg-surface p-6 rounded-xl shadow-lg">
@@ -72,20 +76,16 @@ const TeamManagementPage: React.FC = () => {
           <h2 className="text-2xl font-bold">Existing Teams ({teams.length})</h2>
           {loggedInAdmin && (
             <button
-              onClick={() => setEditingTeam({} as Team)} // You can set to empty or navigate to add team page
+              onClick={handleAddTeam}
               className="bg-primary hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-transform duration-200 hover:scale-105"
             >
               Create New Team
             </button>
           )}
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {teams.map(team => (
-            <div
-              key={team.id}
-              className="bg-background p-4 rounded-lg flex flex-col items-center text-center space-y-3"
-            >
+          {teams.map((team) => (
+            <div key={team.id} className="bg-background p-4 rounded-lg flex flex-col items-center text-center space-y-3">
               <img
                 src={team.logoURL}
                 alt={`${team.name} logo`}
@@ -98,7 +98,7 @@ const TeamManagementPage: React.FC = () => {
               </div>
               <div className="flex space-x-2 pt-2">
                 <button
-                  onClick={() => alert(`View details for ${team.name}`)} // Replace with navigation as needed
+                  onClick={() => handleViewTeam(team.id)}
                   className="p-2 bg-gray-700 rounded-full hover:bg-secondary transition-colors"
                   title="View Details"
                 >
@@ -128,7 +128,11 @@ const TeamManagementPage: React.FC = () => {
         </div>
       </div>
 
-      <Modal isOpen={!!editingTeam} onClose={() => setEditingTeam(null)} title="Edit Team Details">
+      <Modal
+        isOpen={!!editingTeam}
+        onClose={() => setEditingTeam(null)}
+        title="Edit Team Details"
+      >
         <form onSubmit={handleUpdateTeam} className="space-y-4">
           <h3 className="font-semibold text-lg border-b border-gray-700 pb-2">Team Info</h3>
           <input
@@ -147,7 +151,9 @@ const TeamManagementPage: React.FC = () => {
             className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
           />
           <div>
-            <label className="text-sm text-text-secondary">Coins: {editedTeamData.coins?.toLocaleString()} coins</label>
+            <label className="text-sm text-text-secondary">
+              Coins: {editedTeamData.coins?.toLocaleString()} coins
+            </label>
             <input
               name="coins"
               type="range"
@@ -204,7 +210,11 @@ const TeamManagementPage: React.FC = () => {
                 </div>
               ))}
             </div>
-            <button type="button" onClick={addOwner} className="mt-2 text-sm text-primary hover:underline">
+            <button
+              type="button"
+              onClick={addOwner}
+              className="mt-2 text-sm text-primary hover:underline"
+            >
               + Add Owner
             </button>
           </div>

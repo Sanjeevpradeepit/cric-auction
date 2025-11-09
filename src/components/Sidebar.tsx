@@ -16,14 +16,14 @@ const Sidebar: React.FC = () => {
     if (loggedInAdmin) {
       return [
         { page: 'admin-dashboard' as Page, label: 'Dashboard', href: '/dashboard/admin' },
-        { page: 'live-auction' as Page, label: 'Auction Control', href: '/dashboard/admin/auction/live' },
+        { page: 'live-auction' as Page, label: 'Auction Control', href: '/dashboard/admin/live-auction' },
         { page: 'teams' as Page, label: 'Manage Teams', href: '/dashboard/admin/teams' },
-        { page: 'add-team' as Page, label: 'Create New Team', href: '/dashboard/admin/add-team' },
+        // { page: 'add-team' as Page, label: 'Create New Team', href: '/dashboard/admin/add-team' },
         { page: 'players' as Page, label: 'Manage Players', href: '/dashboard/admin/players' },
-        { page: 'add-player' as Page, label: 'Add New Player', href: '/dashboard/admin/add-player' },
+        // { page: 'add-player' as Page, label: 'Add New Player', href: '/dashboard/admin/add-player' },
         { page: 'auction-selection' as Page, label: 'Select for Auction', href: '/dashboard/admin/auction/selection' },
-        { page: 'unsold-players' as Page, label: 'Unsold Players', href: '/dashboard/admin/auction/unsold-players' },
-        { page: 'sold-players' as Page, label: 'Sold Players', href: '/dashboard/admin/auction/sold-players' },
+        { page: 'unsold-players' as Page, label: 'Unsold Players', href: '/dashboard/admin/unsold-players' },
+        { page: 'sold-players' as Page, label: 'Sold Players', href: '/dashboard/admin/sold-players' },
       ];
     }
     if (loggedInTeamId) {
