@@ -4,13 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/contexts/FirebaseContext';
 import { EditIcon, EyeIcon, TrashIcon } from '@/components/IconComponents';
-import Modal from '@/components/Modal';
-import { Owner, Team } from '@/type/types';
+import { TeamManage, Team } from '@/type/types';
 
 const TeamManagementPage: React.FC = () => {
-  const { teams, loggedInAdmin, updateTeam, deleteTeam } = useFirebase();
+  const { teams, loggedInAdmin, updateTeam, deleteTeam, owners} = useFirebase();
   const [editingTeam, setEditingTeam] = useState<Team | null>(null);
-  const [editedTeamData, setEditedTeamData] = useState<Partial<Team> & { owners?: Owner[] }>({});
+  const [editedTeamData, setEditedTeamData] = useState<Partial<Team> & { teamManage?: TeamManage[] }>({});
   const router = useRouter();
 
   useEffect(() => {
@@ -27,18 +26,18 @@ const TeamManagementPage: React.FC = () => {
   };
 
   const handleOwnerChange = (index: number, field: 'name' | 'role', value: string) => {
-    const updatedOwners = [...(editedTeamData.owners || [])];
+    const updatedOwners = [...(editedTeamData.teamManage || [])];
     updatedOwners[index] = { ...updatedOwners[index], [field]: value };
-    setEditedTeamData(prev => ({ ...prev, owners: updatedOwners }));
+    setEditedTeamData(prev => ({ ...prev, teamManage: updatedOwners }));
   };
 
   const addOwner = () => {
-    const newOwner: Owner = { id: `owner-${Date.now()}`, name: '', role: '' };
-    setEditedTeamData(prev => ({ ...prev, owners: [...(prev.owners || []), newOwner] }));
+    const newOwner: TeamManage = { id: `owner-${Date.now()}`, name: '', role: '' };
+    setEditedTeamData(prev => ({ ...prev, teamManage: [...(prev.teamManage || []), newOwner] }));
   };
 
   const removeOwner = (index: number) => {
-    setEditedTeamData(prev => ({ ...prev, owners: prev.owners?.filter((_, i) => i !== index) }));
+    setEditedTeamData(prev => ({ ...prev, teamManage: prev.teamManage?.filter((_, i) => i !== index) }));
   };
 
   const handleDeleteTeam = (teamId: string) => {
@@ -48,7 +47,7 @@ const TeamManagementPage: React.FC = () => {
   };
 
   const handleOpenEditModal = (team: Team) => {
-    setEditingTeam(team);
+    router.push(`/dashboard/team-view/${team?.id}`);
   };
 
   const handleUpdateTeam = (e: React.FormEvent) => {
@@ -68,6 +67,8 @@ const TeamManagementPage: React.FC = () => {
   const handleAddTeam = () => {
     router.push('/dashboard/admin/add-team');
   };
+
+  console.log(owners)
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -127,115 +128,6 @@ const TeamManagementPage: React.FC = () => {
           ))}
         </div>
       </div>
-
-      <Modal
-        isOpen={!!editingTeam}
-        onClose={() => setEditingTeam(null)}
-        title="Edit Team Details"
-      >
-        <form onSubmit={handleUpdateTeam} className="space-y-4">
-          <h3 className="font-semibold text-lg border-b border-gray-700 pb-2">Team Info</h3>
-          <input
-            name="name"
-            value={editedTeamData.name || ''}
-            onChange={handleEditInputChange}
-            placeholder="Team Name"
-            className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
-            required
-          />
-          <input
-            name="logoURL"
-            value={editedTeamData.logoURL || ''}
-            onChange={handleEditInputChange}
-            placeholder="Logo URL"
-            className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
-          />
-          <div>
-            <label className="text-sm text-text-secondary">
-              Coins: {editedTeamData.coins?.toLocaleString()} coins
-            </label>
-            <input
-              name="coins"
-              type="range"
-              min="1000000"
-              max="20000000"
-              step="500000"
-              value={editedTeamData.coins || 0}
-              onChange={handleEditInputChange}
-              className="w-full"
-            />
-          </div>
-          <input
-            name="email"
-            type="email"
-            value={editedTeamData.email || ''}
-            onChange={handleEditInputChange}
-            placeholder="Login Email"
-            className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
-            required
-          />
-          <input
-            name="password"
-            type="text"
-            value={editedTeamData.password || ''}
-            onChange={handleEditInputChange}
-            placeholder="New Password (optional)"
-            className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
-          />
-
-          <div className="border-t border-gray-700 pt-4">
-            <h3 className="font-semibold text-lg mb-2">Manage Owners</h3>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
-              {(editedTeamData.owners || []).map((owner, index) => (
-                <div key={owner.id} className="flex items-center space-x-2">
-                  <input
-                    value={owner.name}
-                    onChange={(e) => handleOwnerChange(index, 'name', e.target.value)}
-                    placeholder="Owner Name"
-                    className="w-1/2 px-2 py-1 bg-background border border-gray-600 rounded"
-                  />
-                  <input
-                    value={owner.role}
-                    onChange={(e) => handleOwnerChange(index, 'role', e.target.value)}
-                    placeholder="Role"
-                    className="w-1/2 px-2 py-1 bg-background border border-gray-600 rounded"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeOwner(index)}
-                    className="p-1 text-red-500 hover:text-red-400"
-                  >
-                    <TrashIcon className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={addOwner}
-              className="mt-2 text-sm text-primary hover:underline"
-            >
-              + Add Owner
-            </button>
-          </div>
-
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-700">
-            <button
-              type="button"
-              onClick={() => setEditingTeam(null)}
-              className="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white font-semibold"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-lg bg-primary hover:bg-blue-700 text-white font-semibold"
-            >
-              Save Changes
-            </button>
-          </div>
-        </form>
-      </Modal>
     </div>
   );
 };

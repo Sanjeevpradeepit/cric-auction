@@ -14,7 +14,7 @@
 //   actionImageURL: string;
 // }
 
-//  interface Owner {
+//  interface TeamManage {
 //   id: string;
 //   name: string;
 //   role: string;
@@ -26,7 +26,7 @@
 //   logoURL: string;
 //   coins: number;
 //   players: Player[];
-//   owners: Owner[];
+//   teamManage: TeamManage[];
 //   email: string;
 //   password?: string | undefined; // In a real app, this would be handled securely
 // }

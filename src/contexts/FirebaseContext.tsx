@@ -4,7 +4,7 @@ import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'f
 import { collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, runTransaction, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from '@/lib/firebase';
-import { Bid, Player, Team } from '@/type/types';
+import { Bid, Owner, Player, Team } from '@/type/types';
 // import { Team } from '../../../types';
 
 
@@ -17,14 +17,18 @@ interface FirebaseContextType {
   teams: Team[];
   players: Player[];
   bids: Bid[];
-  
+  owners: Owner[];
+
+  addOwner: (ownerData: Omit<Owner, 'id'>) => Promise<void>;
+  updateOwner: (ownerId: string, updatedData: Partial<Owner>) => Promise<void>;
+  deleteOwner: (ownerId: string) => Promise<void>;
   // Auth actions
   teamLogin: (email: string, password: string) => Promise<boolean>;
   adminLogin: (password: string) => Promise<boolean>; // Email is fixed for admin
   logout: () => Promise<void>;
   
   // Data actions
-  addTeam: (teamData: Omit<Team, 'id' | 'players' | 'owners'>, logoFile?: File) => Promise<void>;
+  addTeam: (teamData: Omit<Team, 'id' | 'players' | 'teamManage'>, logoFile?: File) => Promise<void>;
   updateTeam: (teamId: string, updatedData: Partial<Team>) => Promise<void>;
   deleteTeam: (teamId: string) => Promise<void>;
   addPlayer: (playerData: Omit<Player, 'id'>, profileImage?: File, actionImage?: File) => Promise<void>;
@@ -87,6 +91,7 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [winningTeam, setWinningTeam] = useState<Team | null>(null);
   const [biddingTurnTeamId, setBiddingTurnTeamId] = useState<string | null>(null);
   const [passedTeams, setPassedTeams] = useState<string[]>([]);
+  const [owners, setOwners] = useState<Owner[]>([]);
 
   // Derived State
   const soldPlayerIds = useMemo(() => teams.flatMap(t => t.players.map(p => p.id)), [teams]);
@@ -96,6 +101,18 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     return bids.filter(b => b.playerId === currentPlayer.id).sort((a, b) => b.amount - a.amount);
   }, [bids, currentPlayer]);
 
+
+ // Owner State
+  useEffect(() => {
+  const unsubscribeOwners = onSnapshot(collection(db, 'owners'), snapshot => {
+    const ownersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Owner));
+    setOwners(ownersData);
+  });
+
+  return () => {
+    unsubscribeOwners();
+  };
+}, []);
 
   // Auth state listener
   useEffect(() => {
@@ -212,10 +229,10 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     await signOut(auth);
   };
   
-  const addTeam = async (teamData: Omit<Team, 'id' | 'players' | 'owners'>, logoFile?: File) => {
+  const addTeam = async (teamData: Omit<Team, 'id' | 'players' | 'teamManage'>, logoFile?: File) => {
     try {
       let logoURL = teamData.logoURL || `https://picsum.photos/seed/${teamData.name}/100`;
-      const docRef = await addDoc(collection(db, 'teams'), { ...teamData, players: [], owners: [] });
+      const docRef = await addDoc(collection(db, 'teams'), { ...teamData, players: [], teamManage: [] });
 
       if (logoFile) {
         logoURL = await uploadFile(logoFile, `team-logos/${docRef.id}/${logoFile.name}`);
@@ -266,6 +283,21 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
   const addBid = async (bidData: Omit<Bid, 'id' | 'timestamp'>) => {
     await addDoc(collection(db, 'bids'), { ...bidData, timestamp: Timestamp.now().toMillis() });
   };
+
+  // --- OWNER ACTIONS ---
+
+  const addOwner = async (ownerData: Omit<Owner, 'id'>) => {
+  await addDoc(collection(db, 'owners'), ownerData);
+};
+
+const updateOwner = async (ownerId: string, updatedData: Partial<Owner>) => {
+  const ownerDoc = doc(db, 'owners', ownerId);
+  await updateDoc(ownerDoc, updatedData);
+};
+
+const deleteOwner = async (ownerId: string) => {
+  await deleteDoc(doc(db, 'owners', ownerId));
+};
   
   // --- AUCTION ACTIONS ---
   
@@ -419,7 +451,12 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     setTimerEnabled,
     closeBidding,
     reAuctionPlayers,
-    addPlayersToAuction
+    addPlayersToAuction,
+      owners,
+  addOwner,
+  updateOwner,
+  deleteOwner,
+    
   };
 
   return (

@@ -8,7 +8,7 @@ import {
 import Modal from "@/components/Modal";
 import PlayerFilters, { Filters } from "@/components/PlayerFilters";
 import { useFirebase } from "@/contexts/FirebaseContext";
-import { Owner, Team } from "@/type/types";
+import { TeamManage, Team } from "@/type/types";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useMemo } from "react";
 // FIX: Replaced useMockData with useFirebase from the context.
@@ -30,7 +30,7 @@ const TeamDetailsPage: React.FC<TeamDetailsPageProps> = ({ params }) => {
   } = useFirebase();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editedTeamData, setEditedTeamData] = useState<
-    Partial<Team> & { owners?: Owner[] }
+    Partial<Team> & { teamManage?: TeamManage[] }
   >({});
 
   const [filters, setFilters] = useState<Filters>({
@@ -81,23 +81,23 @@ const TeamDetailsPage: React.FC<TeamDetailsPageProps> = ({ params }) => {
     field: "name" | "role",
     value: string
   ) => {
-    const updatedOwners = [...(editedTeamData.owners || [])];
+    const updatedOwners = [...(editedTeamData.teamManage || [])];
     updatedOwners[index] = { ...updatedOwners[index], [field]: value };
-    setEditedTeamData((prev) => ({ ...prev, owners: updatedOwners }));
+    setEditedTeamData((prev) => ({ ...prev, teamManage: updatedOwners }));
   };
 
   const addOwner = () => {
-    const newOwner: Owner = { id: `owner-${Date.now()}`, name: "", role: "" };
+    const newOwner: TeamManage = { id: `owner-${Date.now()}`, name: "", role: "" };
     setEditedTeamData((prev) => ({
       ...prev,
-      owners: [...(prev.owners || []), newOwner],
+      teamManage: [...(prev.teamManage || []), newOwner],
     }));
   };
 
   const removeOwner = (index: number) => {
     setEditedTeamData((prev) => ({
       ...prev,
-      owners: prev.owners?.filter((_, i) => i !== index),
+      teamManage: prev.teamManage?.filter((_, i) => i !== index),
     }));
   };
 
@@ -174,8 +174,8 @@ const TeamDetailsPage: React.FC<TeamDetailsPageProps> = ({ params }) => {
                   Team Owners
                 </h3>
                 <div className="space-y-2 mt-2">
-                  {team.owners.length > 0 ? (
-                    team.owners.map((owner) => (
+                  {team.teamManage.length > 0 ? (
+                    team.teamManage.map((owner) => (
                       <div
                         key={owner.id}
                         className="bg-background p-2 rounded-lg"
@@ -188,7 +188,7 @@ const TeamDetailsPage: React.FC<TeamDetailsPageProps> = ({ params }) => {
                     ))
                   ) : (
                     <p className="text-text-secondary text-sm">
-                      No owners listed.
+                      No teamManage listed.
                     </p>
                   )}
                 </div>
@@ -366,7 +366,7 @@ const TeamDetailsPage: React.FC<TeamDetailsPageProps> = ({ params }) => {
           <div className="border-t border-gray-700 pt-4">
             <h3 className="font-semibold text-lg mb-2">Manage Owners</h3>
             <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
-              {(editedTeamData.owners || []).map((owner, index) => (
+              {(editedTeamData.teamManage || []).map((owner, index) => (
                 <div
                   key={owner.id || index}
                   className="flex items-center space-x-2"
@@ -376,7 +376,7 @@ const TeamDetailsPage: React.FC<TeamDetailsPageProps> = ({ params }) => {
                     onChange={(e) =>
                       handleOwnerChange(index, "name", e.target.value)
                     }
-                    placeholder="Owner Name"
+                    placeholder="TeamManage Name"
                     className="w-1/2 px-2 py-1 bg-background border border-gray-600 rounded"
                   />
                   <input
@@ -402,7 +402,7 @@ const TeamDetailsPage: React.FC<TeamDetailsPageProps> = ({ params }) => {
               onClick={addOwner}
               className="mt-2 text-sm text-primary hover:underline"
             >
-              + Add Owner
+              + Add TeamManage
             </button>
           </div>
 

@@ -24,6 +24,7 @@ const Sidebar: React.FC = () => {
         { page: 'auction-selection' as Page, label: 'Select for Auction', href: '/dashboard/admin/auction/selection' },
         { page: 'unsold-players' as Page, label: 'Unsold Players', href: '/dashboard/admin/unsold-players' },
         { page: 'sold-players' as Page, label: 'Sold Players', href: '/dashboard/admin/sold-players' },
+        { page: 'sold-players' as Page, label: 'Owners', href: '/dashboard/owners-management' },
       ];
     }
     if (loggedInTeamId) {

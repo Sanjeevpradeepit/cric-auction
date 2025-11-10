@@ -1,31 +1,34 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useFirebase } from '@/contexts/FirebaseContext';
-import { ArrowLeftIcon } from '@/components/IconComponents';
-import { Team } from '@/type/types';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useFirebase } from "@/contexts/FirebaseContext";
+import { ArrowLeftIcon } from "@/components/IconComponents";
+import { Team } from "@/type/types";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const AddTeamPage: React.FC = () => {
-  const { addTeam } = useFirebase();
+  const { addTeam, owners } = useFirebase();
   const router = useRouter();
 
-  const [newTeam, setNewTeam] = useState<Omit<Team, 'id'> & { password: string }>({
-    name: '',
-    logoURL: '',
+  const [newTeam, setNewTeam] = useState<Omit<Team, "id"> & { password: string }>({
+    ownerId: "",
+    name: "",
+    logoURL: "",
     coins: 10000000,
-    email: '',
-    password: '', // Ensures password is always a string, never undefined
+    email: "",
+    password: "",
     players: [],
-    owners: [],
+    teamManage: [],
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setNewTeam(prev => ({
+    setNewTeam((prev) => ({
       ...prev,
-      [name]: type === 'number' || name === 'coins' ? parseInt(value) : value,
+      [name]: type === "number" || name === "coins" ? parseInt(value) : value,
     }));
   };
 
@@ -39,19 +42,32 @@ const AddTeamPage: React.FC = () => {
     e.preventDefault();
 
     if (newTeam.name.trim() && newTeam.email.trim() && newTeam.password.trim()) {
-      const teamData = {
-        name: newTeam.name,
-        logoURL: newTeam.logoURL,
-        coins: newTeam.coins,
-        email: newTeam.email,
-        password: newTeam.password, // Your backend should handle password securely
-      };
+      try {
+        const teamData = {
+          ownerId: newTeam.ownerId,
+          name: newTeam.name,
+          logoURL: newTeam.logoURL,
+          coins: newTeam.coins,
+          email: newTeam.email,
+          password: newTeam.password,
+        };
 
-      await addTeam(teamData, logoFile || undefined);
-      alert('Team created successfully!');
-      router.push('/dashboard/admin/teams'); // Navigate after creation
+        // Optional: update owner document if you want to mark ownership or similar
+        if (newTeam.ownerId) {
+          const ownerDoc = doc(db, "owners", newTeam.ownerId);
+          await updateDoc(ownerDoc, { selected: true });
+        }
+
+        await addTeam(teamData, logoFile || undefined);
+
+        alert("Team created successfully!");
+        router.push("/dashboard/admin/teams");
+      } catch (error) {
+        console.error("Error creating team:", error);
+        alert("Failed to create team. See console for details.");
+      }
     } else {
-      alert('Please fill in all required fields.');
+      alert("Please fill in all required fields.");
     }
   };
 
@@ -68,55 +84,80 @@ const AddTeamPage: React.FC = () => {
         <h1 className="text-3xl font-bold text-center mb-2">Create New Team</h1>
         <p className="text-center text-text-secondary mb-8">Enter the details for the new team.</p>
         <form onSubmit={handleAddTeam} className="space-y-4">
-          <input
-            name="name"
-            value={newTeam.name}
-            onChange={handleInputChange}
-            placeholder="Team Name"
-            className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
-            required
-          />
-          <div>
-            <label className="text-sm text-text-secondary">Logo Image</label>
-            <input
-              type="file"
-              onChange={handleFileChange}
-              className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30"
-            />
-          </div>
-          <div>
-            <label className="text-sm text-text-secondary">
-              Coins: {newTeam.coins.toLocaleString()} coins
-            </label>
-            <input
-              name="coins"
-              type="range"
-              min="5000000"
-              max="20000000"
-              step="500000"
-              value={newTeam.coins}
-              onChange={handleInputChange}
-              className="w-full"
-            />
-          </div>
-          <input
-            name="email"
-            type="email"
-            value={newTeam.email}
-            onChange={handleInputChange}
-            placeholder="Login Email"
-            className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
-            required
-          />
-          <input
-            name="password"
-            type="password"
-            value={newTeam.password}
-            onChange={handleInputChange}
-            placeholder="Login Password"
-            className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
-            required
-          />
+         <div className="col-span-2">
+  <label htmlFor="ownerId" className="block mb-1 font-medium">Owner</label>
+  <select
+    id="ownerId"
+    name="ownerId"
+    value={newTeam.ownerId}
+    onChange={handleInputChange}
+    className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
+    required
+  >
+    <option value="">Select Owner</option>
+    {owners?.filter(o => !o.selected).map(owner => (
+      <option key={owner.id} value={owner.id}>{owner.name}</option>
+    ))}
+  </select>
+</div>
+
+<input
+  name="name"
+  value={newTeam.name}
+  onChange={handleInputChange}
+  placeholder="Team Name"
+  aria-label="Enter team name"
+  className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
+  required
+/>
+
+<div>
+  <label className="text-sm text-text-secondary">Logo Image</label>
+  <input
+    type="file"
+    onChange={handleFileChange}
+    className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30"
+  />
+</div>
+
+<div>
+  <label className="text-sm text-text-secondary">Coins: {newTeam.coins.toLocaleString()} coins</label>
+  <input
+    name="coins"
+    type="number"
+    // min="5000000"
+    // max="20000000"
+    // step="500000"
+     className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
+    value={newTeam.coins}
+    onChange={handleInputChange}
+   
+  />
+</div>
+
+<input
+  name="email"
+  type="email"
+  value={newTeam.email}
+  onChange={handleInputChange}
+  placeholder="Login Email"
+  aria-label="Enter team login email"
+  className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
+  required
+/>
+
+<input
+  name="password"
+  type="password"
+  value={newTeam.password}
+  onChange={handleInputChange}
+  placeholder="Login Password"
+  aria-label="Enter team login password"
+  className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg"
+  required
+/>
+
+
           <button
             type="submit"
             className="w-full bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105"

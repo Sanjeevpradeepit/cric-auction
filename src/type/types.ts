@@ -53,19 +53,29 @@ export interface Player {
 }
 
 
-export interface Owner {
+export interface TeamManage {
   id: string;
   name: string;
   role: string;
 }
 
+export interface Owner {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  teamIds?: string[];
+  active?:boolean,
+  selected?:boolean,
+}
 export interface Team {
+  ownerId:string;
   id: string;
   name: string;
   logoURL: string;
   coins: number;
   players: Player[];
-  owners: Owner[];
+  teamManage: TeamManage[];
   email: string;
   password?: string; // In a real app, this would be handled securely
 }
