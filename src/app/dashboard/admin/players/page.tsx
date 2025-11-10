@@ -3,6 +3,7 @@ import { EditIcon, EyeIcon, TrashIcon } from '@/components/IconComponents';
 import Modal from '@/components/Modal';
 import PlayerFilters, { Filters } from '@/components/PlayerFilters';
 import { useFirebase } from '@/contexts/FirebaseContext';
+import { Player } from '@/type/types';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useMemo } from 'react';
 
@@ -11,7 +12,7 @@ interface PlayerManagementPageProps {
  
 }
 
-const PlayerManagementPage: React.FC<PlayerManagementPageProps> = () => {
+const PlayerManagementPage: React.FC = () => {
   // FIX: Replaced useMockData with useFirebase and destructured deletePlayer.
     const router = useRouter();
   const { players, updatePlayer, loggedInAdmin, deletePlayer } = useFirebase();
@@ -63,6 +64,9 @@ const PlayerManagementPage: React.FC<PlayerManagementPageProps> = () => {
     const handleViewPlayer = (playerId:string) => {
     router.push(`/dashboard/admin/${playerId}`);
   };
+   const handleEditPlayer = (playerId:string) => {
+    router.push(`/dashboard/${playerId}`);
+  };
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -93,7 +97,7 @@ const PlayerManagementPage: React.FC<PlayerManagementPageProps> = () => {
               </div>
               {loggedInAdmin && (
                 <div className="absolute top-2 right-2 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => setEditingPlayer(player)} className="p-2 bg-gray-800/70 rounded-full hover:bg-primary transition-colors" title="Edit"><EditIcon className="w-4 h-4" /></button>
+                    <button onClick={() => handleEditPlayer(player.id)} className="p-2 bg-gray-800/70 rounded-full hover:bg-primary transition-colors" title="Edit"><EditIcon className="w-4 h-4" /></button>
                     <button onClick={() => handleDeletePlayer(player.id)} className="p-2 bg-gray-800/70 rounded-full hover:bg-red-500 transition-colors" title="Delete"><TrashIcon className="w-4 h-4" /></button>
                     <button onClick={() => handleViewPlayer(player.id)} className="p-2 bg-gray-800/70 rounded-full hover:bg-secondary transition-colors" title="Details"><EyeIcon className="w-4 h-4" /></button>
               </div>

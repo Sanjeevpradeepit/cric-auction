@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/contexts/FirebaseContext';
 import { ArrowLeftIcon } from '@/components/IconComponents';
+import { Team } from '@/type/types';
 
 const AddTeamPage: React.FC = () => {
   const { addTeam } = useFirebase();

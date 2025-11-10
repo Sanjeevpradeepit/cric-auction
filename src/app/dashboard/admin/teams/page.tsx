@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/contexts/FirebaseContext';
 import { EditIcon, EyeIcon, TrashIcon } from '@/components/IconComponents';
 import Modal from '@/components/Modal';
-import { Team } from '@/type/types';
+import { Owner, Team } from '@/type/types';
 
 const TeamManagementPage: React.FC = () => {
   const { teams, loggedInAdmin, updateTeam, deleteTeam } = useFirebase();

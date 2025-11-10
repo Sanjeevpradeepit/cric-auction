@@ -4,6 +4,7 @@ import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'f
 import { collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, runTransaction, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from '@/lib/firebase';
+import { Bid, Player, Team } from '@/type/types';
 // import { Team } from '../../../types';
 
 

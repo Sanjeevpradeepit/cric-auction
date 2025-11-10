@@ -1,6 +1,7 @@
 "use client";
 import { ClockIcon, GavelIcon, MoneyIcon } from '@/components/IconComponents';
 import { useFirebase } from '@/contexts/FirebaseContext';
+import { Player } from '@/type/types';
 import React, { useEffect, useState } from 'react';
 
 const PlayerCard: React.FC<{ player: Player }> = ({ player }) => (
