@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
 // FIX: Replaced useMockData with useFirebase from the context.
-import { useFirebase } from '@/app/contexts/FirebaseContext';
 import { ArrowLeftIcon, MoneyIcon, EditIcon, TrashIcon } from './IconComponents';
 import { Team, TeamManage } from '../type/types';
 import Modal from './Modal';
 import PlayerFilters, { Filters } from './PlayerFilters';
+import { useFirebase } from '@/contexts/FirebaseContext';
 
 interface TeamDetailsPageProps {
   teamId: string;
