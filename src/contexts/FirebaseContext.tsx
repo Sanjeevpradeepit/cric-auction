@@ -5,10 +5,8 @@ import { collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, query, where
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from '@/lib/firebase';
 import { Bid, Owner, Player, Team } from '@/type/types';
-// import { Team } from '../../../types';
 
-
-// Define the shape of the context value
+// Context shape
 interface FirebaseContextType {
   user: User | null;
   loggedInAdmin: boolean;
@@ -22,12 +20,10 @@ interface FirebaseContextType {
   addOwner: (ownerData: Omit<Owner, 'id'>) => Promise<void>;
   updateOwner: (ownerId: string, updatedData: Partial<Owner>) => Promise<void>;
   deleteOwner: (ownerId: string) => Promise<void>;
-  // Auth actions
   teamLogin: (email: string, password: string) => Promise<boolean>;
-  adminLogin: (password: string) => Promise<boolean>; // Email is fixed for admin
+  adminLogin: (password: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  
-  // Data actions
+
   addTeam: (teamData: Omit<Team, 'id' | 'players' | 'teamManage'>, logoFile?: File) => Promise<void>;
   updateTeam: (teamId: string, updatedData: Partial<Team>) => Promise<void>;
   deleteTeam: (teamId: string) => Promise<void>;
@@ -36,9 +32,8 @@ interface FirebaseContextType {
   deletePlayer: (playerId: string) => Promise<void>;
   addBid: (bidData: Omit<Bid, 'id' | 'timestamp'>) => Promise<void>;
 
-  // Auction State
   isAuctionActive: boolean;
-  unsoldPlayers: Player[]; // This is the auction queue
+  unsoldPlayers: Player[];
   soldPlayerIds: string[];
   finalUnsoldPlayers: Player[];
   currentPlayerIndex: number;
@@ -49,8 +44,7 @@ interface FirebaseContextType {
   biddingTurnTeamId: string | null;
   auctionTimerDuration: number;
   isTimerEnabled: boolean;
-  
-  // Auction Actions
+
   startAuctionForPlayer: () => void;
   timerTick: () => void;
   setBiddingTurn: (teamId: string) => void;
@@ -64,36 +58,30 @@ interface FirebaseContextType {
   addPlayersToAuction: (playerIds: string[]) => void;
 }
 
-// Create the context
 const FirebaseContext = createContext<FirebaseContextType | undefined>(undefined);
 
-// Create the provider component
 export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // States
   const [user, setUser] = useState<User | null>(null);
   const [loggedInAdmin, setLoggedInAdmin] = useState(false);
   const [loggedInTeamId, setLoggedInTeamId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Firestore data states
   const [teams, setTeams] = useState<Team[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
   const [bids, setBids] = useState<Bid[]>([]);
-  
-  // Auction State
+  const [owners, setOwners] = useState<Owner[]>([]);
   const [isAuctionActive, setIsAuctionActive] = useState(false);
-  const [unsoldPlayers, setUnsoldPlayers] = useState<Player[]>([]); // The auction queue
+  const [unsoldPlayers, setUnsoldPlayers] = useState<Player[]>([]);
   const [finalUnsoldPlayers, setFinalUnsoldPlayers] = useState<Player[]>([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [currentBid, setCurrentBid] = useState<Bid | null>(null);
   const [timer, setTimer] = useState(60);
   const [auctionTimerDuration, setAuctionTimerDuration] = useState(60);
-  const [isTimerEnabled, setTimerEnabled] = useState(true);
+  const [isTimerEnabled, setTimerEnabledState] = useState(true);
   const [winningTeam, setWinningTeam] = useState<Team | null>(null);
   const [biddingTurnTeamId, setBiddingTurnTeamId] = useState<string | null>(null);
   const [passedTeams, setPassedTeams] = useState<string[]>([]);
-  const [owners, setOwners] = useState<Owner[]>([]);
 
-  // Derived State
   const soldPlayerIds = useMemo(() => teams.flatMap(t => t.players.map(p => p.id)), [teams]);
   const currentPlayer = useMemo(() => unsoldPlayers[currentPlayerIndex], [unsoldPlayers, currentPlayerIndex]);
   const playerBidHistory = useMemo(() => {
@@ -101,18 +89,14 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     return bids.filter(b => b.playerId === currentPlayer.id).sort((a, b) => b.amount - a.amount);
   }, [bids, currentPlayer]);
 
-
- // Owner State
+  // Owners Listener
   useEffect(() => {
-  const unsubscribeOwners = onSnapshot(collection(db, 'owners'), snapshot => {
-    const ownersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Owner));
-    setOwners(ownersData);
-  });
-
-  return () => {
-    unsubscribeOwners();
-  };
-}, []);
+    const unsubscribeOwners = onSnapshot(collection(db, 'owners'), snapshot => {
+      const ownersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Owner));
+      setOwners(ownersData);
+    });
+    return () => unsubscribeOwners();
+  }, []);
 
   // Auth state listener
   useEffect(() => {
@@ -140,7 +124,7 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     });
     return () => unsubscribe();
   }, []);
-  
+
   // Firestore real-time listeners
   useEffect(() => {
     setLoading(true);
@@ -148,19 +132,15 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       const teamsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Team));
       setTeams(teamsData);
     });
-    
     const unsubscribePlayers = onSnapshot(collection(db, 'players'), (snapshot) => {
       const playersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Player));
       setPlayers(playersData);
     });
-
     const unsubscribeBids = onSnapshot(collection(db, 'bids'), (snapshot) => {
-        const bidsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Bid));
-        setBids(bidsData.sort((a, b) => b.timestamp - a.timestamp));
+      const bidsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Bid));
+      setBids(bidsData.sort((a, b) => b.timestamp - a.timestamp));
     });
-
     setLoading(false);
-
     return () => {
       unsubscribeTeams();
       unsubscribePlayers();
@@ -168,43 +148,12 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     };
   }, []);
 
-  const nextTurn = useCallback(() => {
-    const activeBidders = teams.filter(t => !passedTeams.includes(t.id));
-    if (activeBidders.length <= 1) {
-      closeBidding();
-      return;
-    }
-
-    const currentTurnIndex = activeBidders.findIndex(t => t.id === biddingTurnTeamId);
-    const nextTurnIndex = (currentTurnIndex + 1) % activeBidders.length;
-    setBiddingTurnTeamId(activeBidders[nextTurnIndex].id);
-    setTimer(auctionTimerDuration);
-  }, [teams, passedTeams, biddingTurnTeamId, auctionTimerDuration]);
-
-  const timerTick = useCallback(() => {
-    if (isAuctionActive && isTimerEnabled) {
-      setTimer(t => {
-        if (t > 1) return t - 1;
-        
-        // Timer hits 0
-        if(biddingTurnTeamId) {
-             passTurn(biddingTurnTeamId);
-        } else {
-            closeBidding();
-        }
-        return 0;
-      });
-    }
-  }, [isAuctionActive, isTimerEnabled, biddingTurnTeamId]);
-
-  // --- ACTIONS ---
-
+  // --- Actions ---
   const uploadFile = async (file: File, path: string): Promise<string> => {
     const storageRef = ref(storage, path);
     const snapshot = await uploadBytes(storageRef, file);
     return await getDownloadURL(snapshot.ref);
   };
-
   const teamLogin = async (email: string, password: string): Promise<boolean> => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
@@ -214,7 +163,6 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       return false;
     }
   };
-
   const adminLogin = async (password: string): Promise<boolean> => {
     try {
       await signInWithEmailAndPassword(auth, 'superadmin@auction.com', password);
@@ -228,12 +176,11 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
   const logout = async () => {
     await signOut(auth);
   };
-  
+
   const addTeam = async (teamData: Omit<Team, 'id' | 'players' | 'teamManage'>, logoFile?: File) => {
     try {
       let logoURL = teamData.logoURL || `https://picsum.photos/seed/${teamData.name}/100`;
       const docRef = await addDoc(collection(db, 'teams'), { ...teamData, players: [], teamManage: [] });
-
       if (logoFile) {
         logoURL = await uploadFile(logoFile, `team-logos/${docRef.id}/${logoFile.name}`);
         await updateDoc(docRef, { logoURL });
@@ -242,79 +189,52 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       console.error("Error adding team:", error);
     }
   };
-  
   const updateTeam = async (teamId: string, updatedData: Partial<Team>) => {
     const teamDoc = doc(db, 'teams', teamId);
     await updateDoc(teamDoc, updatedData);
   };
-  
   const deleteTeam = async (teamId: string) => {
-     await deleteDoc(doc(db, 'teams', teamId));
+    await deleteDoc(doc(db, 'teams', teamId));
   };
-  
+
   const addPlayer = async (playerData: Omit<Player, 'id'>, profileImage?: File, actionImage?: File) => {
     try {
-        let profileImageURL = playerData.profileImageURL || `https://picsum.photos/seed/${playerData.name}/200`;
-        let actionImageURL = playerData.actionImageURL || `https://picsum.photos/seed/${playerData.name}Action/800/600`;
-
-        const docRef = await addDoc(collection(db, 'players'), playerData);
-
-        if (profileImage) {
-            profileImageURL = await uploadFile(profileImage, `player-images/${docRef.id}/profile.jpg`);
-        }
-        if (actionImage) {
-            actionImageURL = await uploadFile(actionImage, `player-images/${docRef.id}/action.jpg`);
-        }
-        await updateDoc(docRef, { profileImageURL, actionImageURL });
-
-    } catch(e) {
-        console.error("Error adding player: ", e);
+      let profileImageURL = playerData.profileImageURL || `https://picsum.photos/seed/${playerData.name}/200`;
+      let actionImageURL = playerData.actionImageURL || `https://picsum.photos/seed/${playerData.name}Action/800/600`;
+      const docRef = await addDoc(collection(db, 'players'), playerData);
+      if (profileImage) profileImageURL = await uploadFile(profileImage, `player-images/${docRef.id}/profile.jpg`);
+      if (actionImage) actionImageURL = await uploadFile(actionImage, `player-images/${docRef.id}/action.jpg`);
+      await updateDoc(docRef, { profileImageURL, actionImageURL });
+    } catch (e) {
+      console.error("Error adding player: ", e);
     }
   };
-  
   const updatePlayer = async (playerId: string, updatedData: Partial<Player>) => {
     await updateDoc(doc(db, 'players', playerId), updatedData);
   };
-  
   const deletePlayer = async (playerId: string) => {
-     await deleteDoc(doc(db, 'players', playerId));
+    await deleteDoc(doc(db, 'players', playerId));
   };
-
   const addBid = async (bidData: Omit<Bid, 'id' | 'timestamp'>) => {
     await addDoc(collection(db, 'bids'), { ...bidData, timestamp: Timestamp.now().toMillis() });
   };
 
-  // --- OWNER ACTIONS ---
-
+  // --- Owner CRUD ---
   const addOwner = async (ownerData: Omit<Owner, 'id'>) => {
-  await addDoc(collection(db, 'owners'), ownerData);
-};
-
-const updateOwner = async (ownerId: string, updatedData: Partial<Owner>) => {
-  const ownerDoc = doc(db, 'owners', ownerId);
-  await updateDoc(ownerDoc, updatedData);
-};
-
-const deleteOwner = async (ownerId: string) => {
-  await deleteDoc(doc(db, 'owners', ownerId));
-};
-  
-  // --- AUCTION ACTIONS ---
-  
-  const startAuctionForPlayer = () => {
-    if (!currentPlayer) return;
-    setIsAuctionActive(true);
-    setCurrentBid(null);
-    setWinningTeam(null);
-    setTimer(auctionTimerDuration);
-    setBiddingTurnTeamId(null);
-    setPassedTeams([]);
+    await addDoc(collection(db, 'owners'), ownerData);
+  };
+  const updateOwner = async (ownerId: string, updatedData: Partial<Owner>) => {
+    const ownerDoc = doc(db, 'owners', ownerId);
+    await updateDoc(ownerDoc, updatedData);
+  };
+  const deleteOwner = async (ownerId: string) => {
+    await deleteDoc(doc(db, 'owners', ownerId));
   };
 
+  // --- Auction Logic ---
   const closeBidding = useCallback(async () => {
     setIsAuctionActive(false);
     setBiddingTurnTeamId(null);
-    
     if (currentBid && currentPlayer) {
       const winningTeamData = teams.find(t => t.id === currentBid.teamId);
       if (winningTeamData) {
@@ -331,19 +251,86 @@ const deleteOwner = async (ownerId: string) => {
     } else if (currentPlayer) {
       setFinalUnsoldPlayers(prev => [...prev, currentPlayer]);
     }
-
     setTimeout(() => {
-        if(currentPlayerIndex + 1 >= unsoldPlayers.length) {
-            // End of auction queue
-            setUnsoldPlayers([]);
-            setCurrentPlayerIndex(0);
-        } else {
-             setCurrentPlayerIndex(prev => prev + 1);
-        }
-        setWinningTeam(null);
-        setCurrentBid(null);
-    }, 3000); // Wait 3 seconds before moving to next player
+      if (currentPlayerIndex + 1 >= unsoldPlayers.length) {
+        setUnsoldPlayers([]);
+        setCurrentPlayerIndex(0);
+      } else {
+        setCurrentPlayerIndex(prev => prev + 1);
+      }
+      setWinningTeam(null);
+      setCurrentBid(null);
+    }, 3000);
   }, [currentBid, currentPlayer, teams, unsoldPlayers, currentPlayerIndex]);
+
+  const nextTurn = useCallback(() => {
+    const activeBidders = teams.filter(t => !passedTeams.includes(t.id));
+    if (activeBidders.length <= 1) {
+      closeBidding();
+      return;
+    }
+    const currentTurnIndex = activeBidders.findIndex(t => t.id === biddingTurnTeamId);
+    const nextTurnIndex = (currentTurnIndex + 1) % activeBidders.length;
+    setBiddingTurnTeamId(activeBidders[nextTurnIndex].id);
+    setTimer(auctionTimerDuration);
+  }, [teams, passedTeams, biddingTurnTeamId, auctionTimerDuration, closeBidding]);
+
+  const passTurn = useCallback((teamId: string) => {
+    if (biddingTurnTeamId !== teamId) return;
+    setPassedTeams(prev => [...prev, teamId]);
+  }, [biddingTurnTeamId]);
+
+  const timerTick = useCallback(() => {
+    if (isAuctionActive && isTimerEnabled) {
+      setTimer(t => {
+        if (t > 1) return t - 1;
+        if (biddingTurnTeamId) {
+          passTurn(biddingTurnTeamId);
+        } else {
+          closeBidding();
+        }
+        return 0;
+      });
+    }
+  }, [isAuctionActive, isTimerEnabled, biddingTurnTeamId, closeBidding, passTurn]);
+
+  useEffect(() => {
+    if (isAuctionActive && passedTeams.length > 0) {
+      nextTurn();
+    }
+  }, [passedTeams, isAuctionActive, nextTurn]);
+
+  // Other auction actions
+  const startAuctionForPlayer = () => {
+    if (!currentPlayer) return;
+    setIsAuctionActive(true);
+    setCurrentBid(null);
+    setWinningTeam(null);
+    setTimer(auctionTimerDuration);
+    setBiddingTurnTeamId(null);
+    setPassedTeams([]);
+  };
+
+  const setBiddingTurn = (teamId: string) => {
+    setBiddingTurnTeamId(teamId);
+    setTimer(auctionTimerDuration);
+  };
+
+  const setRandomBiddingTurn = () => {
+    const randomTeamIndex = Math.floor(Math.random() * teams.length);
+    setBiddingTurn(teams[randomTeamIndex].id);
+  };
+
+  const addPlayersToAuction = (playerIds: string[]) => {
+    const playersToAdd = players.filter(p => playerIds.includes(p.id));
+    setUnsoldPlayers(prev => [...prev, ...playersToAdd]);
+  };
+
+  const reAuctionPlayers = (playerIds: string[]) => {
+    const playersToReAuction = finalUnsoldPlayers.filter(p => playerIds.includes(p.id));
+    setUnsoldPlayers(prev => [...prev, ...playersToReAuction]);
+    setFinalUnsoldPlayers(prev => prev.filter(p => !playerIds.includes(p.id)));
+  };
 
   const placeBid = (teamId: string, increment: number) => {
     if (!isAuctionActive || !currentPlayer || biddingTurnTeamId !== teamId) {
@@ -355,9 +342,9 @@ const deleteOwner = async (ownerId: string) => {
     const lastBidAmount = currentBid?.amount || 0;
     const baseAmount = lastBidAmount > 0 ? lastBidAmount : currentPlayer.baseCoins;
     const newAmount = increment > 0 ? baseAmount + increment : currentPlayer.baseCoins;
-    
-    if (lastBidAmount === 0 && increment === 0) { // First bid at base price
-        // This logic is fine
+
+    if (lastBidAmount === 0 && increment === 0) {
+      // First bid at base price
     } else if (newAmount <= lastBidAmount) {
       return { success: false, message: 'Bid must be higher than the current bid.' };
     }
@@ -371,45 +358,19 @@ const deleteOwner = async (ownerId: string) => {
       playerId: currentPlayer.id,
       amount: newAmount,
     };
-    addBid(newBid); // This will trigger onSnapshot and update bids state
+    addBid(newBid);
     setCurrentBid({ ...newBid, id: 'temp', timestamp: Date.now() });
 
     nextTurn();
     return { success: true, message: 'Bid placed.' };
   };
 
-  const passTurn = (teamId: string) => {
-      if(biddingTurnTeamId !== teamId) return;
-      setPassedTeams(prev => [...prev, teamId]);
-  }
-
-  useEffect(() => {
-      if(isAuctionActive && passedTeams.length > 0) {
-          nextTurn();
-      }
-  }, [passedTeams, isAuctionActive]);
-
-
-  const setBiddingTurn = (teamId: string) => {
-    setBiddingTurnTeamId(teamId);
-    setTimer(auctionTimerDuration);
+  const handleSetAuctionTimerDuration = (duration: number) => {
+    setAuctionTimerDuration(duration);
   };
-
-  const setRandomBiddingTurn = () => {
-    const randomTeamIndex = Math.floor(Math.random() * teams.length);
-    setBiddingTurn(teams[randomTeamIndex].id);
+  const setTimerEnabled = (enabled: boolean) => {
+    setTimerEnabledState(enabled);
   };
-
-  const addPlayersToAuction = (playerIds: string[]) => {
-      const playersToAdd = players.filter(p => playerIds.includes(p.id));
-      setUnsoldPlayers(prev => [...prev, ...playersToAdd]);
-  }
-
-  const reAuctionPlayers = (playerIds: string[]) => {
-      const playersToReAuction = finalUnsoldPlayers.filter(p => playerIds.includes(p.id));
-      setUnsoldPlayers(prev => [...prev, ...playersToReAuction]);
-      setFinalUnsoldPlayers(prev => prev.filter(p => !playerIds.includes(p.id)));
-  }
 
   const value: FirebaseContextType = {
     user,
@@ -419,6 +380,10 @@ const deleteOwner = async (ownerId: string) => {
     teams,
     players,
     bids,
+    owners,
+    addOwner,
+    updateOwner,
+    deleteOwner,
     teamLogin,
     adminLogin,
     logout,
@@ -452,11 +417,6 @@ const deleteOwner = async (ownerId: string) => {
     closeBidding,
     reAuctionPlayers,
     addPlayersToAuction,
-      owners,
-  addOwner,
-  updateOwner,
-  deleteOwner,
-    
   };
 
   return (
@@ -466,7 +426,6 @@ const deleteOwner = async (ownerId: string) => {
   );
 };
 
-// Custom hook to use the Firebase context
 export const useFirebase = (): FirebaseContextType => {
   const context = useContext(FirebaseContext);
   if (context === undefined) {
