@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useMemo } from 'react';
 // FIX: Replaced useMockData with useFirebase from the context.
-import { useFirebase } from '@/app/contexts/FirebaseContext';
 import PlayerFilters, { Filters } from './PlayerFilters';
+import { useFirebase } from '@/contexts/FirebaseContext';
 
 const AuctionSelectionPage: React.FC = () => {
   // FIX: Replaced useMockData with useFirebase from the context.

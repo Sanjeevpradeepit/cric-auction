@@ -1,8 +1,8 @@
 import React from 'react';
 // FIX: Replaced useMockData with useFirebase from the context.
-import { useFirebase } from '@/app/contexts/FirebaseContext';
 import { BatIcon, TrophyIcon, GavelIcon } from './IconComponents';
 import { Page } from '../type/types';
+import { useFirebase } from '@/contexts/FirebaseContext';
 
 const StatCard: React.FC<{ icon: React.ReactNode; title: string; value: number | string; }> = ({ icon, title, value }) => (
   <div className="bg-surface p-6 rounded-lg shadow-lg flex items-center space-x-4">
