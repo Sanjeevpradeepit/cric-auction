@@ -8,9 +8,9 @@ import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useMemo } from 'react';
 
 
-interface PlayerManagementPageProps {
+// interface PlayerManagementPageProps {
  
-}
+// }
 
 const PlayerManagementPage: React.FC = () => {
   // FIX: Replaced useMockData with useFirebase and destructured deletePlayer.

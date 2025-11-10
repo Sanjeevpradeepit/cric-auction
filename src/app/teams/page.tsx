@@ -20,25 +20,25 @@ const TeamManagementPage: React.FC = () => {
     }
   }, [editingTeam]);
 
-  const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type } = e.target;
-    setEditedTeamData(prev => ({ ...prev, [name]: type === 'number' ? parseInt(value) : value }));
-  };
+  // const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value, type } = e.target;
+  //   setEditedTeamData(prev => ({ ...prev, [name]: type === 'number' ? parseInt(value) : value }));
+  // };
 
-  const handleOwnerChange = (index: number, field: 'name' | 'role', value: string) => {
-    const updatedOwners = [...(editedTeamData.teamManage || [])];
-    updatedOwners[index] = { ...updatedOwners[index], [field]: value };
-    setEditedTeamData(prev => ({ ...prev, teamManage: updatedOwners }));
-  };
+  // const handleOwnerChange = (index: number, field: 'name' | 'role', value: string) => {
+  //   const updatedOwners = [...(editedTeamData.teamManage || [])];
+  //   updatedOwners[index] = { ...updatedOwners[index], [field]: value };
+  //   setEditedTeamData(prev => ({ ...prev, teamManage: updatedOwners }));
+  // };
 
-  const addOwner = () => {
-    const newOwner: TeamManage = { id: `owner-${Date.now()}`, name: '', role: '' };
-    setEditedTeamData(prev => ({ ...prev, teamManage: [...(prev.teamManage || []), newOwner] }));
-  };
+  // const addOwner = () => {
+  //   const newOwner: TeamManage = { id: `owner-${Date.now()}`, name: '', role: '' };
+  //   setEditedTeamData(prev => ({ ...prev, teamManage: [...(prev.teamManage || []), newOwner] }));
+  // };
 
-  const removeOwner = (index: number) => {
-    setEditedTeamData(prev => ({ ...prev, teamManage: prev.teamManage?.filter((_, i) => i !== index) }));
-  };
+  // const removeOwner = (index: number) => {
+  //   setEditedTeamData(prev => ({ ...prev, teamManage: prev.teamManage?.filter((_, i) => i !== index) }));
+  // };
 
   const handleDeleteTeam = (teamId: string) => {
     if (window.confirm('Are you sure you want to delete this team?')) {

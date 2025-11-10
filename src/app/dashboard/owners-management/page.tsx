@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useFirebase } from '@/contexts/FirebaseContext';
 
 export default function OwnersPage() {
-  const { owners, addOwner, updateOwner, deleteOwner } = useFirebase();
+  const { owners, addOwner, deleteOwner } = useFirebase();
 
   const [newOwner, setNewOwner] = useState({ name: '', email: '', phone: '' });
 

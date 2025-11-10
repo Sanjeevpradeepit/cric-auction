@@ -110,9 +110,6 @@ const bowlingStats = {
 };
 
 
-console.log(battingStats)
-console.log(playerBids, "playerBids")
-
 
   return (
     <div className="w-7xl space-y-8">
