@@ -14,9 +14,9 @@ const EditPlayerPage: React.FC = () => {
   const player = players.find((p) => p.id === params.playerId);
 
   // Optional: sort player bids
-  const playerBids = bids
-    .filter((b) => b.playerId === params.playerId)
-    .sort((a, b) => b.timestamp - a.timestamp);
+  // const playerBids = bids
+  //   .filter((b) => b.playerId === params.playerId)
+  //   .sort((a, b) => b.timestamp - a.timestamp);
 
   const handleOnBack = () => {
     router.push(`/dashboard/admin/players`);

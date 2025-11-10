@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Player } from "@/type/types";
 import { useFirebase } from "@/contexts/FirebaseContext";
 import { useRouter } from "next/navigation";
@@ -18,9 +18,10 @@ interface PlayerFormProps {
 const PlayerForm: React.FC<PlayerFormProps> = ({initialData, playerId}) => {
 
   // Detect edit mode
-  const isEditMode = !!initialData;
-  const { addPlayer, updateTeam } = useFirebase();
+ const isEditMode = !!initialData;
+  const { addPlayer, updatePlayer } = useFirebase();
   const router = useRouter();
+
   const [player, setPlayer] = useState<Omit<Player, "id">>({
     name: "",
     nationality: "",
@@ -71,87 +72,92 @@ const PlayerForm: React.FC<PlayerFormProps> = ({initialData, playerId}) => {
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [actionFile, setActionFile] = useState<File | null>(null);
 
-
-    // ✅ Prefill data when editing
   useEffect(() => {
     if (initialData) {
-      setPlayer({
-        ...player,
+      setPlayer((prev) => ({
+        ...prev,
         ...initialData,
-        stats: { ...player.stats, ...initialData.stats },
-      });
+        stats: { ...prev.stats, ...initialData.stats },
+      }));
     }
   }, [initialData]);
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value, type } = e.target;
-
-    if (name.startsWith("stats.")) {
-      const statKey = name.split(".")[1];
-      setPlayer((prev) => ({
-        ...prev,
-        stats: {
-          ...prev.stats,
-          [statKey]:
-            type === "number" ? (value === "" ? "" : Number(value)) : value,
-        },
-      }));
-    } else if (name === "debutDate") {
-      setPlayer((prev) => ({
-        ...prev,
-        [name]: value || undefined,
-      }));
-    } else if (["age", "baseCoins"].includes(name)) {
-      setPlayer((prev) => ({
-        ...prev,
-        [name]: value === "" ? "" : Number(value),
-      }));
-    } else {
-      setPlayer((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-  };
-
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  try {
-    if (isEditMode && playerId) {
-      // Update mode
-      if (player.name?.trim()) {
-        await updateTeam(playerId, player);
-        alert("Player updated successfully!");
+  const handleChange = useCallback(
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >
+    ) => {
+      const { name, value, type } = e.target;
+      if (name.startsWith("stats.")) {
+        const statKey = name.split(".")[1];
+        setPlayer((prev) => ({
+          ...prev,
+          stats: {
+            ...prev.stats,
+            [statKey]:
+              type === "number" ? (value === "" ? 0 : Number(value)) : value,
+          },
+        }));
+      } else if (name === "debutDate") {
+        setPlayer((prev) => ({
+          ...prev,
+          [name]: value || undefined,
+        }));
+      } else if (["age", "baseCoins"].includes(name)) {
+        setPlayer((prev) => ({
+          ...prev,
+          [name]: value === "" ? 0 : Number(value),
+        }));
+      } else {
+        setPlayer((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
       }
-    } else {
-      // Create mode
-      await addPlayer(player, profileFile || undefined, actionFile || undefined);
-      alert("Player added successfully!");
-    }
+    },
+    []
+  );
 
-    router.push(`/dashboard/admin/players`);
-  } catch (error) {
-    console.error(error);
-    alert("An error occurred while saving player data."); // notify user of error
-  }
-};
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      try {
+        if (isEditMode && playerId) {
+          if (player.name?.trim()) {
+            await updatePlayer(playerId, player);
+            alert("Player updated successfully!");
+          }
+        } else {
+          await addPlayer(player, profileFile || undefined, actionFile || undefined);
+          alert("Player added successfully!");
+        }
+        router.push(`/dashboard/admin/players`);
+      } catch (error) {
+        console.error("Error saving player data:", error);
+        alert("An error occurred while saving player data.");
+      }
+    },
+    [isEditMode, playerId, player, profileFile, actionFile, updatePlayer, addPlayer, router]
+  );
 
-  const handleProfileFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setProfileFile(e.target.files[0]);
-    }
-  };
+  const handleProfileFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+        setProfileFile(e.target.files[0]);
+      }
+    },
+    []
+  );
 
-  const handleActionFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setActionFile(e.target.files[0]);
-    }
-  };
+  const handleActionFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+        setActionFile(e.target.files[0]);
+      }
+    },
+    []
+  );
 
   return (
     <form

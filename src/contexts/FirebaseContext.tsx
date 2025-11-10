@@ -365,9 +365,9 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     return { success: true, message: 'Bid placed.' };
   };
 
-  const handleSetAuctionTimerDuration = (duration: number) => {
-    setAuctionTimerDuration(duration);
-  };
+  // const handleSetAuctionTimerDuration = (duration: number) => {
+  //   setAuctionTimerDuration(duration);
+  // };
   const setTimerEnabled = (enabled: boolean) => {
     setTimerEnabledState(enabled);
   };
