@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { Page, Player } from '../../types';
+import { Page, Player } from '../type/types';
 import { ArrowLeftIcon } from './IconComponents';
 import { useFirebase } from '@/app/contexts/FirebaseContext';
 

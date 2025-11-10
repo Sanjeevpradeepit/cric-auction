@@ -1,119 +1,97 @@
-"use client";
-import React, { useState, useEffect, useMemo } from 'react';
-import { Player, Page } from '../../types';
+import React from 'react';
 // FIX: Replaced useMockData with useFirebase from the context.
-import { useFirebase } from '@/app/contexts/FirebaseContext';
-import { EditIcon, TrashIcon, EyeIcon } from './IconComponents';
-import Modal from './Modal';
-import PlayerFilters, { Filters } from './PlayerFilters';
+import { ArrowLeftIcon } from './IconComponents';
+import { useFirebase } from '@/contexts/FirebaseContext';
 
-interface PlayerManagementPageProps {
-  onViewPlayer: (playerId: string) => void;
-  setCurrentPage: (page: Page) => void;
+interface PlayerDetailsPageProps {
+  playerId: string;
 }
 
-const PlayerManagementPage: React.FC<PlayerManagementPageProps> = ({ onViewPlayer, setCurrentPage }) => {
-  // FIX: Replaced useMockData with useFirebase and destructured deletePlayer.
-  const { players, updatePlayer, loggedInAdmin, deletePlayer } = useFirebase();
-  
-  const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
-  const [editedPlayerData, setEditedPlayerData] = useState<Partial<Player>>({});
-  const [filters, setFilters] = useState<Filters>({ position: 'All', nationality: '', maxBaseCoins: 2000000 });
+const StatItem: React.FC<{ label: string; value: string | number }> = ({ label, value }) => (
+    <div className="text-center bg-background p-4 rounded-lg">
+        <p className="text-sm text-text-secondary">{label}</p>
+        <p className="text-2xl font-bold text-text-primary">{value}</p>
+    </div>
+);
 
-  const filteredPlayers = useMemo(() => {
-    return players.filter(player => {
-      const positionMatch = filters.position === 'All' || player.position === filters.position;
-      const nationalityMatch = player.nationality.toLowerCase().includes(filters.nationality.toLowerCase());
-      const priceMatch = player.baseCoins <= filters.maxBaseCoins;
-      return positionMatch && nationalityMatch && priceMatch;
-    });
-  }, [players, filters]);
+const PlayerDetailsPage: React.FC = () => {
+  // FIX: Replaced useMockData with useFirebase from the context.
+  const { players, teams, bids } = useFirebase();
+  
+  const player = players.find(p => p.id === playerId);
+  const playerBids = bids.filter(b => b.playerId === playerId).sort((a,b) => b.timestamp - a.timestamp);
 
-  useEffect(() => {
-    if (editingPlayer) {
-      setEditedPlayerData(editingPlayer);
-    }
-  }, [editingPlayer]);
-  
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setEditedPlayerData(prev => ({ ...prev, [name]: name === 'baseCoins' ? parseInt(value) : value }));
-  };
-  
-  const handleDeletePlayer = (playerId: string) => {
-    if (window.confirm('Are you sure you want to delete this player?')) {
-      // FIX: Use deletePlayer function from context.
-      deletePlayer(playerId);
-    }
+  const handleBack = () =>{
+
+  }
+ 
+  if (!player) {
+    return (
+      <div>
+        <button onClick={handleBack} className="flex items-center space-x-2 text-primary hover:underline mb-4">
+          <ArrowLeftIcon className="w-5 h-5" />
+          <span>Back</span>
+        </button>
+        <p>Player not found.</p>
+      </div>
+    );
   }
 
-  const handleUpdatePlayer = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingPlayer) {
-      updatePlayer(editingPlayer.id, editedPlayerData);
-      setEditingPlayer(null);
-    }
-  };
-
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      <div className="bg-surface p-6 rounded-xl shadow-lg">
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-4">
-          <h2 className="text-2xl font-bold">Player Database ({filteredPlayers.length})</h2>
-          {loggedInAdmin && (
-            <button
-              onClick={() => setCurrentPage('add-player')}
-              className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-lg transition-transform duration-200 hover:scale-105"
-            >
-              Add New Player
-            </button>
-          )}
-        </div>
-         <PlayerFilters filters={filters} setFilters={setFilters} maxPriceLimit={2000000} />
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filteredPlayers.map(player => (
-            <div key={player.id} className="relative bg-background rounded-lg overflow-hidden group">
-              <div className="cursor-pointer border-2 border-transparent" onClick={() => onViewPlayer(player.id)}>
-                <img src={player.profileImageURL} alt={player.name} className="w-full h-40 object-cover" />
-                <div className="p-3">
-                  <h3 className="font-bold">{player.name}</h3>
-                  <p className="text-sm text-text-secondary">{player.nationality}</p>
-                  <p className="text-sm text-secondary font-semibold">{player.position}</p>
-                </div>
-              </div>
-              {loggedInAdmin && (
-                <div className="absolute top-2 right-2 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => setEditingPlayer(player)} className="p-2 bg-gray-800/70 rounded-full hover:bg-primary transition-colors" title="Edit"><EditIcon className="w-4 h-4" /></button>
-                    <button onClick={() => handleDeletePlayer(player.id)} className="p-2 bg-gray-800/70 rounded-full hover:bg-red-500 transition-colors" title="Delete"><TrashIcon className="w-4 h-4" /></button>
-                    <button onClick={() => onViewPlayer(player.id)} className="p-2 bg-gray-800/70 rounded-full hover:bg-secondary transition-colors" title="Details"><EyeIcon className="w-4 h-4" /></button>
-              </div>
-              )}
-            </div>
-          ))}
-        </div>
-    </div>
-      
-      <Modal isOpen={!!editingPlayer} onClose={() => setEditingPlayer(null)} title="Edit Player Details">
-          <form onSubmit={handleUpdatePlayer} className="space-y-4">
-            <input name="name" value={editedPlayerData.name || ''} onChange={handleEditChange} placeholder="Player Name" className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg" required />
-            <input name="nationality" value={editedPlayerData.nationality || ''} onChange={handleEditChange} placeholder="Nationality" className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg" required />
-            <select name="position" value={editedPlayerData.position || 'Batsman'} onChange={handleEditChange} className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg">
-              <option>Batsman</option>
-              <option>Bowler</option>
-              <option>All-Rounder</option>
-              <option>Wicketkeeper</option>
-            </select>
-            <input name="profileImageURL" value={editedPlayerData.profileImageURL || ''} onChange={handleEditChange} placeholder="Profile Image URL" className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg" />
-            <input name="actionImageURL" value={editedPlayerData.actionImageURL || ''} onChange={handleEditChange} placeholder="Action Image URL" className="w-full px-3 py-2 bg-background border border-gray-600 rounded-lg" />
-            <div className="flex justify-end space-x-3 pt-2">
-              <button type="button" onClick={() => setEditingPlayer(null)} className="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white font-semibold">Cancel</button>
-              <button type="submit" className="px-4 py-2 rounded-lg bg-primary hover:bg-blue-700 text-white font-semibold">Save Changes</button>
-            </div>
-          </form>
-      </Modal>
+    <div className="space-y-8">
+      <div>
+        <button onClick={handleBack} className="flex items-center space-x-2 text-primary hover:underline mb-4">
+          <ArrowLeftIcon className="w-5 h-5" />
+          <span>Back</span>
+        </button>
+      </div>
 
+      <div className="bg-surface rounded-xl shadow-2xl overflow-hidden relative">
+        <img src={player.actionImageURL} alt={`${player.name} in action`} className="w-full h-64 object-cover" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/80 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 p-6 text-white">
+            <img src={player.profileImageURL} alt={player.name} className="w-24 h-24 rounded-full object-cover border-4 border-primary mb-4" />
+            <h1 className="text-4xl font-extrabold">{player.name}</h1>
+            <p className="text-lg text-gray-300">{player.nationality} - <span className="font-semibold text-secondary">{player.position}</span></p>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-surface p-6 rounded-xl shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">Player Statistics</h2>
+            <div className="grid grid-cols-2 gap-4">
+                <StatItem label="Base Coins" value={`${player.baseCoins.toLocaleString()} coins`} />
+                <StatItem label="Batting Avg" value={player.stats.battingAverage.toFixed(2)} />
+                <StatItem label="Strike Rate" value={player.stats.strikeRate.toFixed(2)} />
+                <StatItem label="Wickets" value={player.stats.wickets} />
+                <StatItem label="Economy" value={player.stats.economyRate.toFixed(2)} />
+            </div>
+        </div>
+
+        <div className="bg-surface p-6 rounded-xl shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">Auction Bid History</h2>
+             <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-2">
+                {playerBids.map(bid => {
+                    const team = teams.find(t => t.id === bid.teamId);
+                    return (
+                        <div key={bid.id} className="bg-background p-3 rounded-lg text-sm">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-2">
+                                    <img src={team?.logoURL} alt={team?.name} className="w-6 h-6 rounded-full"/>
+                                    <p className="font-bold">{team?.name || 'Unknown Team'}</p>
+                                </div>
+                                <p className="font-mono text-secondary font-semibold">{bid.amount.toLocaleString()} coins</p>
+                            </div>
+                            <p className="text-xs text-text-secondary text-right">{new Date(bid.timestamp).toLocaleString()}</p>
+                        </div>
+                    );
+                })}
+                {playerBids.length === 0 && <p className="text-text-secondary">No bids were placed on this player.</p>}
+            </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default PlayerManagementPage;
+export default PlayerDetailsPage;

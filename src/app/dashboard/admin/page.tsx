@@ -1,0 +1,80 @@
+"use client";
+
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { useFirebase } from '@/contexts/FirebaseContext';
+import { BatIcon, GavelIcon, TrophyIcon } from '@/components/IconComponents';
+
+const StatCard: React.FC<{ icon: React.ReactNode; title: string; value: number | string }> = ({ icon, title, value }) => (
+  <div className="bg-surface p-6 rounded-lg shadow-lg flex items-center space-x-4">
+    <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary/20 text-primary">
+      {icon}
+    </div>
+    <div>
+      <p className="text-sm font-medium text-text-secondary">{title}</p>
+      <p className="text-2xl font-bold text-text-primary">{value}</p>
+    </div>
+  </div>
+);
+
+const SuperAdminDashboard: React.FC = () => {
+  const { teams, players, bids } = useFirebase();
+  const router = useRouter();
+
+  return (
+    <div className="space-y-8">
+      <section>
+        <h1 className="text-4xl font-extrabold text-white tracking-tight mb-4">
+          Super Admin Dashboard
+        </h1>
+        <p className="text-lg text-text-secondary">
+          Welcome, Admin. Here's a snapshot of the platform activity.
+        </p>
+      </section>
+
+      <section className="grid md:grid-cols-3 gap-8">
+        <StatCard
+          icon={<TrophyIcon className="w-6 h-6" />}
+          title="Total Teams"
+          value={teams.length}
+        />
+        <StatCard
+          icon={<BatIcon className="w-6 h-6" />}
+          title="Total Players"
+          value={players.length}
+        />
+        <StatCard
+          icon={<GavelIcon className="w-6 h-6" />}
+          title="Total Bids Placed"
+          value={bids.length}
+        />
+      </section>
+
+      <section className="bg-surface rounded-lg p-6">
+        <h2 className="text-2xl font-bold mb-4">Quick Actions</h2>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <button
+            onClick={() => router.push('/dashboard/admin/auction/live')}
+            className="bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105"
+          >
+            Go to Auction Control
+          </button>
+          <button
+            onClick={() => router.push('/dashboard/admin/teams')}
+            className="bg-secondary hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105"
+          >
+            Manage Teams
+          </button>
+          <button
+            onClick={() => router.push('/dashboard/admin/players')}
+            className="bg-surface hover:bg-background text-white font-bold py-3 px-6 rounded-lg border border-gray-600 transition-colors"
+          >
+            Manage Players
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default SuperAdminDashboard;

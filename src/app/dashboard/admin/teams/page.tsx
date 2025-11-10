@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useFirebase } from '../contexts/FirebaseContext';
 import { useRouter } from 'next/navigation';
-import { EditIcon, TrashIcon, EyeIcon } from './IconComponents';
-import Modal from './Modal';
-import { Team, TeamManage } from '@/type/types';
+import { useFirebase } from '@/contexts/FirebaseContext';
+import { EditIcon, EyeIcon, TrashIcon } from '@/components/IconComponents';
+import Modal from '@/components/Modal';
+import { TeamManage, Team } from '@/type/types';
 
 const TeamManagementPage: React.FC = () => {
   const { teams, loggedInAdmin, updateTeam, deleteTeam } = useFirebase();
@@ -48,7 +48,7 @@ const TeamManagementPage: React.FC = () => {
   };
 
   const handleOpenEditModal = (team: Team) => {
-    setEditingTeam(team);
+    router.push(`/dashboard/team-view/${team?.id}`);
   };
 
   const handleUpdateTeam = (e: React.FormEvent) => {

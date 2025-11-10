@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./styles/globals.css";
-import { FirebaseProvider } from "./contexts/FirebaseContext";
+import "./../styles/globals.css";
+import { FirebaseProvider } from "@/contexts/FirebaseContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

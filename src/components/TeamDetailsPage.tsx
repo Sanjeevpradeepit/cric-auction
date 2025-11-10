@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 // FIX: Replaced useMockData with useFirebase from the context.
 import { useFirebase } from '@/app/contexts/FirebaseContext';
 import { ArrowLeftIcon, MoneyIcon, EditIcon, TrashIcon } from './IconComponents';
-import { Team, Owner } from '../../types';
+import { Team, TeamManage } from '../type/types';
 import Modal from './Modal';
 import PlayerFilters, { Filters } from './PlayerFilters';
 
@@ -17,7 +17,7 @@ const TeamDetailsPage: React.FC<TeamDetailsPageProps> = ({ teamId, onBack, onVie
   // FIX: Replaced useMockData with useFirebase from the context.
   const { teams, loggedInAdmin, loggedInTeamId, updateTeam, bids, players: allPlayers } = useFirebase();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editedTeamData, setEditedTeamData] = useState<Partial<Team> & { owners?: Owner[] }>({});
+  const [editedTeamData, setEditedTeamData] = useState<Partial<Team> & { teamManage?: TeamManage[] }>({});
   
   const [filters, setFilters] = useState<Filters>({ position: 'All', nationality: '', maxBaseCoins: 20000000 });
 
@@ -52,18 +52,18 @@ const TeamDetailsPage: React.FC<TeamDetailsPageProps> = ({ teamId, onBack, onVie
   }
 
   const handleOwnerChange = (index: number, field: 'name' | 'role', value: string) => {
-    const updatedOwners = [...(editedTeamData.owners || [])];
+    const updatedOwners = [...(editedTeamData.teamManage || [])];
     updatedOwners[index] = { ...updatedOwners[index], [field]: value };
-    setEditedTeamData(prev => ({ ...prev, owners: updatedOwners }));
+    setEditedTeamData(prev => ({ ...prev, teamManage: updatedOwners }));
   };
 
   const addOwner = () => {
-    const newOwner: Owner = { id: `owner-${Date.now()}`, name: '', role: '' };
-    setEditedTeamData(prev => ({ ...prev, owners: [...(prev.owners || []), newOwner] }));
+    const newOwner: TeamManage = { id: `owner-${Date.now()}`, name: '', role: '' };
+    setEditedTeamData(prev => ({ ...prev, teamManage: [...(prev.teamManage || []), newOwner] }));
   };
 
   const removeOwner = (index: number) => {
-    setEditedTeamData(prev => ({ ...prev, owners: prev.owners?.filter((_, i) => i !== index) }));
+    setEditedTeamData(prev => ({ ...prev, teamManage: prev.teamManage?.filter((_, i) => i !== index) }));
   };
   
   const handleUpdateTeam = (e: React.FormEvent) => {
@@ -118,12 +118,12 @@ const TeamDetailsPage: React.FC<TeamDetailsPageProps> = ({ teamId, onBack, onVie
                   <div>
                       <h3 className="text-lg font-semibold text-text-secondary">Team Owners</h3>
                        <div className="space-y-2 mt-2">
-                          {team.owners.length > 0 ? team.owners.map(owner => (
+                          {team.teamManage.length > 0 ? team.teamManage.map(owner => (
                           <div key={owner.id} className="bg-background p-2 rounded-lg">
                               <p className="font-bold text-sm">{owner.name}</p>
                               <p className="text-xs text-text-secondary">{owner.role}</p>
                           </div>
-                          )) : <p className="text-text-secondary text-sm">No owners listed.</p>}
+                          )) : <p className="text-text-secondary text-sm">No teamManage listed.</p>}
                       </div>
                   </div>
                   <div>
@@ -204,15 +204,15 @@ const TeamDetailsPage: React.FC<TeamDetailsPageProps> = ({ teamId, onBack, onVie
              <div className="border-t border-gray-700 pt-4">
                 <h3 className="font-semibold text-lg mb-2">Manage Owners</h3>
                 <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
-                    {(editedTeamData.owners || []).map((owner, index) => (
+                    {(editedTeamData.teamManage || []).map((owner, index) => (
                         <div key={owner.id || index} className="flex items-center space-x-2">
-                            <input value={owner.name} onChange={(e) => handleOwnerChange(index, 'name', e.target.value)} placeholder="Owner Name" className="w-1/2 px-2 py-1 bg-background border border-gray-600 rounded" />
+                            <input value={owner.name} onChange={(e) => handleOwnerChange(index, 'name', e.target.value)} placeholder="TeamManage Name" className="w-1/2 px-2 py-1 bg-background border border-gray-600 rounded" />
                             <input value={owner.role} onChange={(e) => handleOwnerChange(index, 'role', e.target.value)} placeholder="Role" className="w-1/2 px-2 py-1 bg-background border border-gray-600 rounded" />
                             <button type="button" onClick={() => removeOwner(index)} className="p-1 text-red-500 hover:text-red-400"><TrashIcon className="w-4 h-4" /></button>
                         </div>
                     ))}
                 </div>
-                <button type="button" onClick={addOwner} className="mt-2 text-sm text-primary hover:underline">+ Add Owner</button>
+                <button type="button" onClick={addOwner} className="mt-2 text-sm text-primary hover:underline">+ Add TeamManage</button>
             </div>
 
             <div className="flex justify-end space-x-3 pt-4 border-t border-gray-700">
