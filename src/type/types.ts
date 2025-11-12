@@ -78,6 +78,7 @@ export interface Team {
   teamManage: TeamManage[];
   email: string;
   password?: string; // In a real app, this would be handled securely
+  role?:string;
 }
 
 

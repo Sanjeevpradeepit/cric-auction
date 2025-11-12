@@ -61,9 +61,9 @@ export default function OwnersPage() {
               <p className="text-sm">{owner.email}</p>
               <p className="text-sm">{owner.phone}</p>
             </div>
-            <button onClick={() => handleDelete(owner.id)} className="text-red-600 hover:underline">
+            {/* <button onClick={() => handleDelete(owner.id)} className="text-red-600 hover:underline">
               Delete
-            </button>
+            </button> */}
           </div>
         ))}
       </div>

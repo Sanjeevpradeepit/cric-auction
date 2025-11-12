@@ -26,6 +26,8 @@ const AdminLoginPage: React.FC = () => {
     }
   };
 
+
+
   return (
     <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 200px)' }}>
       <div className="max-w-md w-full bg-surface p-8 rounded-xl shadow-lg">
@@ -64,6 +66,15 @@ const AdminLoginPage: React.FC = () => {
           >
             Login
           </button>
+           <p className="text-center text-text-secondary text-xs mt-4">
+          Don't have an account? Go to{' '}
+          <button
+            onClick={() => router.push('/')}
+            className="text-primary hover:underline"
+          >
+            Home
+          </button>
+        </p>
         </form>
       </div>
     </div>

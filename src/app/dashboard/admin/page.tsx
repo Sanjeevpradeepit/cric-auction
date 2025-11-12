@@ -55,19 +55,19 @@ const SuperAdminDashboard: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <button
             onClick={() => router.push('/dashboard/admin/auction/live')}
-            className="bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105"
+            className="bg-primary hover:bg-secondary text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105"
           >
             Go to Auction Control
           </button>
           <button
             onClick={() => router.push('/dashboard/admin/teams')}
-            className="bg-secondary hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105"
+            className="bg-secondary hover:bg-primary text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105"
           >
             Manage Teams
           </button>
           <button
             onClick={() => router.push('/dashboard/admin/players')}
-            className="bg-surface hover:bg-background text-white font-bold py-3 px-6 rounded-lg border border-gray-600 transition-colors"
+            className="bg-primary hover:bg-secondary text-white font-bold py-3 px-6 rounded-lg border transition-colors"
           >
             Manage Players
           </button>

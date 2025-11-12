@@ -28,7 +28,7 @@ const Header: React.FC = () => {
 
           {/* Logo for public or logged-out users */}
           <div className="flex items-center">
-            {!isLoggedIn && (
+  
               <div
                 className="flex-shrink-0 text-white flex items-center gap-2 cursor-pointer"
                 onClick={goToHome}
@@ -50,7 +50,7 @@ const Header: React.FC = () => {
                   />
                 </span>
               </div>
-            )}
+
           </div>
 
           {/* Right-side controls */}

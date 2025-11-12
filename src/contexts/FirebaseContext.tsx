@@ -1,10 +1,13 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from 'react';
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
 import { collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, runTransaction, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { auth, db, storage } from '@/lib/firebase';
+import { auth, db, firebaseConfig, storage } from '@/lib/firebase';
 import { Bid, Owner, Player, Team } from '@/type/types';
+
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { initializeApp, deleteApp } from 'firebase/app';
 
 // Context shape
 interface FirebaseContextType {
@@ -24,7 +27,7 @@ interface FirebaseContextType {
   adminLogin: (password: string) => Promise<boolean>;
   logout: () => Promise<void>;
 
-  addTeam: (teamData: Omit<Team, 'id' | 'players' | 'teamManage'>, logoFile?: File) => Promise<void>;
+  addTeam: (teamData: Omit<Team, "id" | "players" | "teamManage"> & { email: string; password: string }, logoFile?: File) => Promise<void>;
   updateTeam: (teamId: string, updatedData: Partial<Team>) => Promise<void>;
   deleteTeam: (teamId: string) => Promise<void>;
   addPlayer: (playerData: Omit<Player, 'id'>, profileImage?: File, actionImage?: File) => Promise<void>;
@@ -177,7 +180,33 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     await signOut(auth);
   };
 
-  const addTeam = async (teamData: Omit<Team, 'id' | 'players' | 'teamManage'>, logoFile?: File) => {
+  async function createUserViaBackend(email: string, password: string) {
+  const functions = getFunctions();
+  const createAuthUser = httpsCallable(functions, 'createAuthUser');
+  try {
+    const result = await createAuthUser({ email, password });
+    console.log('User created on backend:', result.data);
+  } catch (error) {
+    console.error('Backend user creation failed:', error);
+  }
+}
+
+ const createUserWithoutLogin = async(email:string, password:string)=> {
+  // Create a secondary app instance (doesn’t affect your main auth state)
+  const secondaryApp = initializeApp(firebaseConfig, "Secondary");
+  const secondaryAuth = getAuth(secondaryApp);
+
+  const userCred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+
+  // Optional: sign out the secondary auth (to clean up session)
+  await signOut(secondaryAuth);
+
+  // Optional: delete secondary app to free memory
+  await deleteApp(secondaryApp);
+
+  return userCred.user;
+}
+ const addTeam = async (teamData: Omit<Team, 'id' | 'players' | 'teamManage'>, logoFile?: File) => {
     try {
       let logoURL = teamData.logoURL || `https://picsum.photos/seed/${teamData.name}/100`;
       const docRef = await addDoc(collection(db, 'teams'), { ...teamData, players: [], teamManage: [] });
@@ -333,7 +362,8 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   const placeBid = (teamId: string, increment: number) => {
-    if (!isAuctionActive || !currentPlayer || biddingTurnTeamId !== teamId) {
+    if (!isAuctionActive || !currentPlayer ) {
+    // if (!isAuctionActive || !currentPlayer || biddingTurnTeamId !== teamId) {
       return { success: false, message: 'Not your turn or auction is inactive.' };
     }
     const team = teams.find(t => t.id === teamId);

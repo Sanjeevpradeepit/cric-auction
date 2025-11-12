@@ -16,7 +16,8 @@ interface PlayerFormProps {
 
 
 const PlayerForm: React.FC<PlayerFormProps> = ({initialData, playerId}) => {
-
+ // Add loading state
+  const [loading, setLoading] = useState(false);
   // Detect edit mode
  const isEditMode = !!initialData;
   const { addPlayer, updatePlayer } = useFirebase();
@@ -122,6 +123,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({initialData, playerId}) => {
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+        setLoading(true); // start loading
       try {
         if (isEditMode && playerId) {
           if (player.name?.trim()) {
@@ -136,6 +138,8 @@ const PlayerForm: React.FC<PlayerFormProps> = ({initialData, playerId}) => {
       } catch (error) {
         console.error("Error saving player data:", error);
         alert("An error occurred while saving player data.");
+      } finally {
+        setLoading(false); // stop loading
       }
     },
     [isEditMode, playerId, player, profileFile, actionFile, updatePlayer, addPlayer, router]
@@ -406,13 +410,15 @@ const PlayerForm: React.FC<PlayerFormProps> = ({initialData, playerId}) => {
           />
         </div>
       </div>
-
-      <button
-        type="submit"
-        className="mt-6 bg-primary text-white rounded px-6 py-3 font-semibold hover:bg-primary-dark transition"
-      >
-        Save Player
-      </button>
+ <button
+          type="submit"
+          disabled={loading}  // disable while loading
+          className={`w-full bg-primary text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105 
+            ${loading ? "opacity-50 cursor-not-allowed hover:scale-100" : "hover:bg-blue-700"}`}
+        >
+          {loading ? "Saving..." : "Save Player"}  {/* conditional button text */}
+        </button>
+    
     </form>
   );
 };

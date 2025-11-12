@@ -21,9 +21,11 @@ const AddTeamPage: React.FC = () => {
     password: "",
     players: [],
     teamManage: [],
+    
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
-
+ // Add loading state
+  const [loading, setLoading] = useState(false);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     setNewTeam((prev) => ({
@@ -40,8 +42,8 @@ const AddTeamPage: React.FC = () => {
 
   const handleAddTeam = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (newTeam.name.trim() && newTeam.email.trim() && newTeam.password.trim()) {
+      setLoading(true); // start loading
       try {
         const teamData = {
           ownerId: newTeam.ownerId,
@@ -50,9 +52,9 @@ const AddTeamPage: React.FC = () => {
           coins: newTeam.coins,
           email: newTeam.email,
           password: newTeam.password,
+          role: "team",
         };
 
-        // Optional: update owner document if you want to mark ownership or similar
         if (newTeam.ownerId) {
           const ownerDoc = doc(db, "owners", newTeam.ownerId);
           await updateDoc(ownerDoc, { selected: true });
@@ -65,6 +67,8 @@ const AddTeamPage: React.FC = () => {
       } catch (error) {
         console.error("Error creating team:", error);
         alert("Failed to create team. See console for details.");
+      } finally {
+        setLoading(false); // stop loading
       }
     } else {
       alert("Please fill in all required fields.");
@@ -159,11 +163,13 @@ const AddTeamPage: React.FC = () => {
 
 
           <button
-            type="submit"
-            className="w-full bg-primary hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105"
-          >
-            Save Team
-          </button>
+          type="submit"
+          disabled={loading}  // disable while loading
+          className={`w-full bg-primary text-white font-bold py-3 px-6 rounded-lg transition-transform duration-200 hover:scale-105 
+            ${loading ? "opacity-50 cursor-not-allowed hover:scale-100" : "hover:bg-blue-700"}`}
+        >
+          {loading ? "Saving..." : "Save Team"}  {/* conditional button text */}
+        </button>
         </form>
       </div>
     </div>
