@@ -129,7 +129,7 @@ const LiveAuctionPage: React.FC = () => {
               <ClockIcon className={`w-8 h-8 ${isTimerEnabled ? 'text-secondary' : 'text-gray-500'}`} />
               <p
                 className={`text-5xl font-mono font-bold ${
-                  timer < 10 && timer > 0 ? 'text-red-500 animate-pulse' : 'text-white'
+                  timer < 10 && timer > 0 ? 'text-red-500 animate-pulse' : 'text-secondary'
                 } ${!isTimerEnabled && 'opacity-50'}`}
               >
                 {timer}
