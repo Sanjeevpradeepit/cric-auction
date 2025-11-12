@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
       return;
     }
     // On success, navigate to team's dashboard
-    router.push('/dashboard/team-dashboard');
+    router.push('/team-dashboard');
   };
 
   return (
