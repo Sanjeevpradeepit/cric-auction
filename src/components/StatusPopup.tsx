@@ -1,7 +1,8 @@
-import { useFirebase } from "@/contexts/FirebaseContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
+import { View } from "react-native-reanimated/lib/typescript/Animated";
 
 type StatusPopupProps = {
   message: string;
@@ -10,9 +11,9 @@ type StatusPopupProps = {
 };
 
 const StatusPopup: React.FC<StatusPopupProps> = ({ message, colorClass, imageURL }) => {
-  const { addTeam, handleBidSubmit } = useFirebase();
+  const router = useRouter();
   return (
-    <AnimatePresence>
+   <AnimatePresence>
       {message && (
         <motion.div
           key="popup"
@@ -41,16 +42,17 @@ const StatusPopup: React.FC<StatusPopupProps> = ({ message, colorClass, imageURL
               </div>
             )}
             <p className="text-3xl font-extrabold tracking-wide">{message}</p>
+          {/* {message &&  <button
+  onClick={()=>router.push('/dashboard/admin/live-auction')}
+  className="bg-blue-600 text-white px-4 py-2 rounded font-bold hover:bg-blue-800"
+>
+  Back
+</button>} */}
           </motion.div>
         </motion.div>
       )}
-     <button
-  onClick={handleBidSubmit}
-  className="bg-primary text-white px-4 py-2 rounded font-bold hover:bg-secondary"
->
-  Back
-</button>
     </AnimatePresence>
+
   );
 };
 

@@ -19,7 +19,7 @@ export default function RootPage() {
     if (loggedInTeamId) {
       router.push(`/team-dashboard/${loggedInTeamId}`); // navigate to team page
     } else if (loggedInAdmin) {
-      router.push("/admin/dashboard"); // navigate to admin page
+      router.push("/dashboard/admin/"); // navigate to admin page
     }
   }, [loading, loggedInTeamId, loggedInAdmin, router]);
 

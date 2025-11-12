@@ -1,9 +1,7 @@
 "use client";
 import { ClockIcon, GavelIcon, MoneyIcon } from '@/components/IconComponents';
-import StatusPopup from '@/components/StatusPopup';
 import { useFirebase } from '@/contexts/FirebaseContext';
 import { Player } from '@/type/types';
-import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 const PlayerCard: React.FC<{ player: Player }> = ({ player }) => (
@@ -32,14 +30,9 @@ const StatItem: React.FC<{ label: string; value: string | number }> = ({ label, 
 );
 
 const LiveAuctionPage: React.FC = () => {
-      const router = useRouter();
-     const params = useParams<{ liveId: string }>();
-     const liveIndex = params.liveId;
-     const [popupMessage, setPopupMessage] = useState<string | null>(null);
-const [popupColor, setPopupColor] = useState<string>('border-gray-400');
     // FIX: Replaced useMockData with useFirebase from the context.
     const {
-        teams, unsoldPlayers, currentPlayerIndex, currentBid, playerBidHistory, players,
+        teams, unsoldPlayers, currentPlayerIndex, currentBid, playerBidHistory,
         timer, isAuctionActive, winningTeam, biddingTurnTeamId,
         startAuctionForPlayer, timerTick, loggedInAdmin, setBiddingTurn, setRandomBiddingTurn,
         placeBid, auctionTimerDuration, setAuctionTimerDuration, isTimerEnabled, setTimerEnabled, closeBidding
@@ -63,10 +56,10 @@ const [popupColor, setPopupColor] = useState<string>('border-gray-400');
             setAdminBidIncrements(prev => ({ ...prev, [teamId]: '' })); // clear input on success
         }
     };
-    // const currentPlayer = unsoldPlayers[parseInt(liveIndex, 10)];
-    const currentPlayer = unsoldPlayers[parseInt(liveIndex)];
+    
+    const currentPlayer = unsoldPlayers[currentPlayerIndex];
     const highestBidder = teams.find(t => t.id === currentBid?.teamId);
-    const biddingTurnTeam = teams.find(t => t.id === biddingTurnTeamId); 
+    const biddingTurnTeam = teams.find(t => t.id === biddingTurnTeamId);
 
     const getStatusMessage = () => {
         if(winningTeam) return <p className="text-lg font-bold text-green-400">SOLD to {winningTeam.name}!</p>;
@@ -85,13 +78,11 @@ const [popupColor, setPopupColor] = useState<string>('border-gray-400');
         return <div className="text-center text-xl font-bold">Waiting for next player...</div>;
     }
 
-
-
-
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
                 <PlayerCard player={currentPlayer} />
+                
                 <div className="bg-surface p-6 rounded-xl shadow-lg">
                     <h3 className="text-2xl font-bold mb-4">Bidding Arena</h3>
                     <div className="flex flex-col md:flex-row items-center justify-between bg-background p-4 rounded-lg">
@@ -104,22 +95,10 @@ const [popupColor, setPopupColor] = useState<string>('border-gray-400');
                         </div>
                         <div className="flex items-center space-x-4">
                             <ClockIcon className={`w-8 h-8 ${isTimerEnabled ? 'text-secondary' : 'text-gray-500'}`}/>
-                            <p className={`text-5xl font-mono font-bold ${timer < 10 && timer > 0 ? 'text-red-500 animate-pulse' : 'text-secondary'} ${!isTimerEnabled && 'opacity-50'}`}>{timer}</p>
+                            <p className={`text-5xl font-mono font-bold ${timer < 10 && timer > 0 ? 'text-red-500 animate-pulse' : 'text-white'} ${!isTimerEnabled && 'opacity-50'}`}>{timer}</p>
                         </div>
                         <div className="mt-4 md:mt-0 text-center">
                             {getStatusMessage()}
-                          {/* {popupMessage && (
-  <StatusPopup
-    message={popupMessage}
-    colorClass={popupColor}
-    imageURL={
-      winningTeam?.logoURL ||
-      currentPlayer?.profileImageURL ||
-      "/images/default-popup.png"
-    }
-  />
-)} */}
-
                             {loggedInAdmin && isAuctionActive && (
                                 <button onClick={closeBidding} className="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
                                     Close Bidding
@@ -139,7 +118,7 @@ const [popupColor, setPopupColor] = useState<string>('border-gray-400');
                                     type="number"
                                     value={auctionTimerDuration}
                                     onChange={(e) => setAuctionTimerDuration(parseInt(e.target.value))}
-                                    className="w-20 bg-background text-secondary rounded p-2 border border-gray-600"
+                                    className="w-20 bg-background text-white rounded p-2 border border-gray-600"
                                  />
                             </div>
                             <div className="flex items-center space-x-2">
@@ -178,8 +157,7 @@ const [popupColor, setPopupColor] = useState<string>('border-gray-400');
                     <h3 className="text-xl font-bold mb-4">Teams</h3>
                     <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
                         {teams.map(team => (
-                            <div key={team.id} className={`bg-background p-3 rounded-lg border-2`}>
-                            {/* <div key={team.id} className={`bg-background p-3 rounded-lg border-2 ${biddingTurnTeamId === team.id ? 'border-yellow-400' : 'border-transparent'}`}> */}
+                            <div key={team.id} className={`bg-background p-3 rounded-lg border-2 ${biddingTurnTeamId === team.id ? 'border-yellow-400' : 'border-transparent'}`}>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-3">
                                         <img src={team.logoURL} alt={team.name} className="w-10 h-10 rounded-full" />

@@ -247,6 +247,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({initialData, playerId}) => {
             name="dob"
             type="date"
             value={player.dob}
+            required
             onChange={handleChange}
             className="w-full border border-gray-300 rounded px-3 py-2"
           />
@@ -365,6 +366,7 @@ const PlayerForm: React.FC<PlayerFormProps> = ({initialData, playerId}) => {
             id="debutDate"
             name="debutDate"
             type="date"
+            required
             value={player.debutDate ?? ""}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded px-3 py-2"
