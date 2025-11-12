@@ -1,3 +1,4 @@
+import { useFirebase } from "@/contexts/FirebaseContext";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import React from "react";
@@ -9,6 +10,7 @@ type StatusPopupProps = {
 };
 
 const StatusPopup: React.FC<StatusPopupProps> = ({ message, colorClass, imageURL }) => {
+  const { addTeam, handleBidSubmit } = useFirebase();
   return (
     <AnimatePresence>
       {message && (
@@ -42,6 +44,12 @@ const StatusPopup: React.FC<StatusPopupProps> = ({ message, colorClass, imageURL
           </motion.div>
         </motion.div>
       )}
+     <button
+  onClick={handleBidSubmit}
+  className="bg-primary text-white px-4 py-2 rounded font-bold hover:bg-secondary"
+>
+  Back
+</button>
     </AnimatePresence>
   );
 };

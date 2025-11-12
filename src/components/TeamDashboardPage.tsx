@@ -157,7 +157,7 @@ const TeamDashboardPage: React.FC<TeamDashboardPageProps> = ({ onViewPlayer }) =
             loggedInTeam.players.map(player => (
               <div
                 key={player.id}
-                className="bg-background p-3 rounded-lg flex items-center space-x-4 cursor-pointer hover:bg-gray-800"
+                className="bg-background p-3 rounded-lg flex items-center space-x-4 cursor-pointer bg-surface p-6 rounded-lg shadow-lg hover:shadow-primary/50 transition-shadow duration-300 transform hover:-translate-y-1"
                 onClick={() => onViewPlayer(player.id)}
               >
                 <img

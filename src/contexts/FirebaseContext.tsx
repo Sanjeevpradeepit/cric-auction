@@ -57,6 +57,7 @@ interface FirebaseContextType {
   setAuctionTimerDuration: (duration: number) => void;
   setTimerEnabled: (enabled: boolean) => void;
   closeBidding: () => void;
+  handleBidSubmit: () => void;
   reAuctionPlayers: (playerIds: string[]) => void;
   addPlayersToAuction: (playerIds: string[]) => void;
 }
@@ -260,6 +261,17 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     await deleteDoc(doc(db, 'owners', ownerId));
   };
 
+
+  const handleBidSubmit =()=>{
+    if (currentPlayerIndex + 1 >= unsoldPlayers.length) {
+        setUnsoldPlayers([]);
+        setCurrentPlayerIndex(0);
+      } else {
+        setCurrentPlayerIndex(prev => prev + 1);
+      }
+      setWinningTeam(null);
+      setCurrentBid(null);
+  }
   // --- Auction Logic ---
   const closeBidding = useCallback(async () => {
     setIsAuctionActive(false);
@@ -280,16 +292,16 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     } else if (currentPlayer) {
       setFinalUnsoldPlayers(prev => [...prev, currentPlayer]);
     }
-    setTimeout(() => {
-      if (currentPlayerIndex + 1 >= unsoldPlayers.length) {
-        setUnsoldPlayers([]);
-        setCurrentPlayerIndex(0);
-      } else {
-        setCurrentPlayerIndex(prev => prev + 1);
-      }
-      setWinningTeam(null);
-      setCurrentBid(null);
-    }, 3000);
+    // setTimeout(() => {
+    //   if (currentPlayerIndex + 1 >= unsoldPlayers.length) {
+    //     setUnsoldPlayers([]);
+    //     setCurrentPlayerIndex(0);
+    //   } else {
+    //     setCurrentPlayerIndex(prev => prev + 1);
+    //   }
+    //   setWinningTeam(null);
+    //   setCurrentBid(null);
+    // }, 3000);
   }, [currentBid, currentPlayer, teams, unsoldPlayers, currentPlayerIndex]);
 
   const nextTurn = useCallback(() => {
@@ -445,6 +457,7 @@ export const FirebaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     setAuctionTimerDuration,
     setTimerEnabled,
     closeBidding,
+    handleBidSubmit,
     reAuctionPlayers,
     addPlayersToAuction,
   };

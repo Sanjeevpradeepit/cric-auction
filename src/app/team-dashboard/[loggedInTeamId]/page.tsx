@@ -45,7 +45,7 @@ const TeamDashboardPage: React.FC = () => {
     const isMyTurn = biddingTurnTeamId === loggedInTeamId;
 
       const handleViewPlayer = (playerId:string) => {
-    router.push(`/dashboard/admin/${playerId}`);
+    router.push(`/team-dashboard/player/${playerId}`);
   };
 
     if (!loggedInTeam) return <Loading />;
@@ -117,7 +117,7 @@ const TeamDashboardPage: React.FC = () => {
                 <h2 className="text-2xl font-bold mb-4">Your Roster ({loggedInTeam.players.length})</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {loggedInTeam.players.length > 0 ? loggedInTeam.players.map(player => (
-                    <div key={player.id} className="bg-background p-3 rounded-lg flex items-center space-x-4 cursor-pointer hover:bg-gray-800" onClick={() => handleViewPlayer(player.id)}>
+                    <div key={player.id} className="bg-background p-3 rounded-lg flex items-center space-x-4 cursor-pointer bg-surface p-6 rounded-lg shadow-lg hover:shadow-primary/50 transition-shadow duration-300 transform hover:-translate-y-1" onClick={() => handleViewPlayer(player.id)}>
                         <img src={player.profileImageURL} alt={player.name} className="w-12 h-12 rounded-full object-cover" />
                         <div>
                         <p className="font-bold">{player.name}</p>
