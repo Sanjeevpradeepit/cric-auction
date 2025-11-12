@@ -2,7 +2,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { View } from "react-native-reanimated/lib/typescript/Animated";
 
 type StatusPopupProps = {
   message: string;
